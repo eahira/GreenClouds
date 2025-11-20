@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    public event System.Action<Enemy> OnEnemyDied;
+
     [Header("Stats")]
     public int maxHealth = 10;
     public int currentHealth;
@@ -42,6 +44,7 @@ public class Enemy : MonoBehaviour
     void Die()
     {
         GameManager.Instance.OnEnemyKilled();
+        OnEnemyDied?.Invoke(this);
         Destroy(gameObject);
     }
 

@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public LayerMask enemyLayer;
+
     [Header("Movement")]
     public float moveSpeed = 5f;
     private Vector2 movement;
@@ -45,20 +47,22 @@ public class PlayerController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
 
-            if (hit.collider != null && hit.collider.CompareTag("Enemy"))
+            // Raycast ТОЛЬКО по врагам
+            RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero, 0.1f, enemyLayer);
+
+            if (hit.collider != null)
             {
                 Enemy enemy = hit.collider.GetComponent<Enemy>();
-                enemy.TakeDamage(clickDamage);
-
-                // Вызов всплывающего текста
-                FloatingDamageText.Spawn(enemy.transform.position, clickDamage);
-
-                ultimateSystem.AddCharge(1);
+                if (enemy != null)
+                {
+                    enemy.TakeDamage(clickDamage);
+                    ultimateSystem?.AddCharge(1);
+                }
             }
         }
     }
+
 
     public void TakeDamage(int damage)
     {
