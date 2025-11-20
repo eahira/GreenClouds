@@ -2,15 +2,29 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public int health = 3;
+    [Header("Stats")]
+    public int maxHealth = 10;
+    public int currentHealth;
+
+    [Header("Damage")]
+    public int contactDamage = 10;
+
+    [Header("Loot")]
     public GameObject lootPrefab;
+
+    private void Awake()
+    {
+        currentHealth = maxHealth;
+    }
 
     public void TakeDamage(int damage)
     {
-        health -= damage;
-        Debug.Log("Враг получил урон! Здоровье: " + health);
+        currentHealth -= damage;
 
-        if (health <= 0)
+        // Вызов обновления UI HP бара (будет сделано Викой)
+        EnemyEvents.OnEnemyHealthChanged?.Invoke(currentHealth, maxHealth);
+
+        if (currentHealth <= 0)
         {
             DropLoot();
             Die();
@@ -22,13 +36,23 @@ public class Enemy : MonoBehaviour
         if (lootPrefab != null)
         {
             Instantiate(lootPrefab, transform.position, Quaternion.identity);
-            Debug.Log("Выпал лут!");
         }
     }
 
     void Die()
     {
-        Debug.Log("Враг умер!");
+        GameManager.Instance.OnEnemyKilled();
         Destroy(gameObject);
     }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            PlayerController player = other.GetComponent<PlayerController>();
+            if (player != null)
+                player.TakeDamage(contactDamage);
+        }
+    }
+
 }

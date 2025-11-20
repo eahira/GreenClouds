@@ -3,45 +3,40 @@ using UnityEngine.UI;
 
 public class UltimateSystem : MonoBehaviour
 {
-    [Header("Ultimate UI")]
     public Image ultimateFill;
-    public Text ultimateText; // Обычный Text вместо TextMeshPro
+    public Text ultimateText;
 
-    [Header("Settings")]
     public int currentCharge = 0;
     public int chargeNeeded = 10;
+
     public float ultimateDamage = 50f;
     public float ultimateRadius = 3f;
-
-    private float maxWidth = 300f;
 
     void Update()
     {
         UpdateUI();
 
         if (currentCharge >= chargeNeeded)
-        {
             ActivateUltimate();
-        }
     }
 
     void UpdateUI()
     {
-        if (ultimateFill != null && ultimateText != null)
+        if (ultimateFill != null)
         {
-            // Вычисляем проценты
             float fillPercent = (float)currentCharge / chargeNeeded;
-            int percent = Mathf.RoundToInt(fillPercent * 100);
+            float maxWidth = 300f; // твой размер
+            RectTransform rt = ultimateFill.GetComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(maxWidth * fillPercent, rt.sizeDelta.y);
+        }
 
-            // Меняем ширину заполнения
-            float newWidth = maxWidth * fillPercent;
-            RectTransform fillRect = ultimateFill.GetComponent<RectTransform>();
-            fillRect.sizeDelta = new Vector2(newWidth, fillRect.sizeDelta.y);
-
-            // Обновляем текст
-            ultimateText.text = percent + "%";
+        if (ultimateText != null)
+        {
+            float percent = (float)currentCharge / chargeNeeded * 100f;
+            ultimateText.text = Mathf.RoundToInt(percent) + "%";
         }
     }
+
 
     public void AddCharge(int amount)
     {
@@ -50,32 +45,15 @@ public class UltimateSystem : MonoBehaviour
 
     void ActivateUltimate()
     {
-        Debug.Log("УЛЬТИМЕЙТ АКТИВИРОВАН!");
-
-        // AoE урон по врагам в радиусе
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, ultimateRadius);
-        foreach (Collider2D enemyCollider in hitEnemies)
+        Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, ultimateRadius);
+        foreach (var col in enemies)
         {
-            if (enemyCollider.CompareTag("Enemy"))
-            {
-                Enemy enemy = enemyCollider.GetComponent<Enemy>();
-                if (enemy != null)
-                {
-                    enemy.TakeDamage((int)ultimateDamage);
-                    Debug.Log("AoE урон по врагу: " + ultimateDamage);
-                }
-            }
+            if (col.CompareTag("Enemy"))
+                col.GetComponent<Enemy>().TakeDamage((int)ultimateDamage);
         }
 
-        // Сбрасываем и увеличиваем сложность
         currentCharge = 0;
         chargeNeeded += 5;
         ultimateDamage += 10f;
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, ultimateRadius);
     }
 }
