@@ -8,7 +8,7 @@ public class Loot : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Игрок подобрал " + coins + " монет!");
+            GameManager.Instance.AddCoins(coins);
             Destroy(gameObject);
         }
     }
