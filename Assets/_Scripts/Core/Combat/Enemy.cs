@@ -8,6 +8,10 @@ public class Enemy : MonoBehaviour
     public int maxHealth = 10;
     public int currentHealth;
 
+    [Header("Movement")]
+    public float moveSpeed = 2f;
+    private Transform player;
+
     [Header("Damage")]
     public int contactDamage = 10;
 
@@ -19,11 +23,32 @@ public class Enemy : MonoBehaviour
         currentHealth = maxHealth;
     }
 
+    private void Update()
+    {
+        MoveTowardsPlayer();
+    }
+
+    /// <summary>
+    /// Вызывается после спавна врага, чтобы передать ему ссылку на игрока
+    /// </summary>
+    public void Init(Transform playerTransform)
+    {
+        player = playerTransform;
+    }
+
+    private void MoveTowardsPlayer()
+    {
+        if (player == null) return;
+
+        Vector2 direction = (player.position - transform.position).normalized;
+        transform.position += (Vector3)direction * moveSpeed * Time.deltaTime;
+    }
+
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
 
-        // Вызов обновления UI HP бара (будет сделано Викой)
+        // Обновление UI HP врага (если будет нужно)
         EnemyEvents.OnEnemyHealthChanged?.Invoke(currentHealth, maxHealth);
 
         if (currentHealth <= 0)
@@ -57,5 +82,4 @@ public class Enemy : MonoBehaviour
                 player.TakeDamage(contactDamage);
         }
     }
-
 }

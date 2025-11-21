@@ -15,7 +15,6 @@ public class RoomManager : MonoBehaviour
     public UnityEvent OnRoomCleared;
 
     private List<Enemy> aliveEnemies = new List<Enemy>();
-    private bool roomStarted = false;
     private bool roomCleared = false;
 
     void Start()
@@ -25,16 +24,14 @@ public class RoomManager : MonoBehaviour
 
     public void StartRoom()
     {
-        if (roomStarted) return;
-
-        roomStarted = true;
+        roomCleared = false;
 
         int count = Random.Range(minEnemies, maxEnemies + 1);
 
         // Спавним врагов
         aliveEnemies = enemySpawner.SpawnEnemies(count);
 
-        // Подписываемся на смерть каждого  
+        // Подписываемся на событие смерти у каждого врага
         foreach (Enemy e in aliveEnemies)
         {
             e.OnEnemyDied += HandleEnemyDeath;
