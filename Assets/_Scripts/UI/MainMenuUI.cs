@@ -5,18 +5,17 @@ public class MainMenuUI : MonoBehaviour
 {
     public void OnPlayPressed()
     {
-        // пока стыкуем к SampleScene — потом заменим на LevelSelect
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("CharacterSelectorScene");
     }
 
     public void OnShopPressed()
     {
-        SceneManager.LoadScene("ShopScene"); // создадим позже
+        SceneManager.LoadScene("ShopScene");
     }
 
     public void OnSettingsPressed()
     {
-        SceneManager.LoadScene("SettingsScene"); // создадим позже
+        SceneManager.LoadScene("SettingsScene");
     }
 
     public void OnExitPressed()
