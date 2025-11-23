@@ -58,7 +58,7 @@ public class CharacterSelectorUI : MonoBehaviour
         // Здесь будет логика для передачи выбранного персонажа в игровую механику
 
         // После принятия — начинаем сцену игры
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("DifficultySelectorScene");
     }
 
     // Обновление интерфейса с информацией о персонаже
