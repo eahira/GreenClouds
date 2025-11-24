@@ -48,12 +48,13 @@ public class PlayerController : MonoBehaviour
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-            // Raycast “ќЋ№ ќ по врагам
-            RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero, 0.1f, enemyLayer);
+            // „уть более "толста€" зона клика Ч проще попасть
+            float radius = 0.2f;
+            Collider2D hit = Physics2D.OverlapCircle(mousePos, radius, enemyLayer);
 
-            if (hit.collider != null)
+            if (hit != null)
             {
-                Enemy enemy = hit.collider.GetComponent<Enemy>();
+                Enemy enemy = hit.GetComponent<Enemy>();
                 if (enemy != null)
                 {
                     enemy.TakeDamage(clickDamage);
@@ -62,7 +63,6 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
 
     public void TakeDamage(int damage)
     {

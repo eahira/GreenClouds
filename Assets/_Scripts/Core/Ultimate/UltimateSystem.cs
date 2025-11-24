@@ -15,9 +15,6 @@ public class UltimateSystem : MonoBehaviour
     void Update()
     {
         UpdateUI();
-
-        if (currentCharge >= chargeNeeded)
-            ActivateUltimate();
     }
 
     void UpdateUI()
@@ -25,7 +22,9 @@ public class UltimateSystem : MonoBehaviour
         if (ultimateFill != null)
         {
             float fillPercent = (float)currentCharge / chargeNeeded;
-            float maxWidth = 300f; // твой размер
+            fillPercent = Mathf.Clamp01(fillPercent);
+
+            float maxWidth = 300f; // ширина полоски (можешь помен€ть под свой UI)
             RectTransform rt = ultimateFill.GetComponent<RectTransform>();
             rt.sizeDelta = new Vector2(maxWidth * fillPercent, rt.sizeDelta.y);
         }
@@ -37,10 +36,19 @@ public class UltimateSystem : MonoBehaviour
         }
     }
 
-
     public void AddCharge(int amount)
     {
-        currentCharge = Mathf.Min(currentCharge + amount, chargeNeeded);
+        currentCharge += amount;
+
+        if (currentCharge >= chargeNeeded)
+        {
+            ActivateUltimate();
+
+            // —брасываем и усложн€ем ульту дл€ следующего раза
+            currentCharge = 0;
+            chargeNeeded += 5;
+            ultimateDamage += 10f;
+        }
     }
 
     void ActivateUltimate()
@@ -49,11 +57,16 @@ public class UltimateSystem : MonoBehaviour
         foreach (var col in enemies)
         {
             if (col.CompareTag("Enemy"))
-                col.GetComponent<Enemy>().TakeDamage((int)ultimateDamage);
+            {
+                Enemy enemy = col.GetComponent<Enemy>();
+                if (enemy != null)
+                    enemy.TakeDamage((int)ultimateDamage);
+            }
         }
+    }
 
-        currentCharge = 0;
-        chargeNeeded += 5;
-        ultimateDamage += 10f;
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.DrawWireSphere(transform.position, ultimateRadius);
     }
 }
