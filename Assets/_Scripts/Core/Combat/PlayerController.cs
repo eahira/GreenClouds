@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-            // Чуть более "толстая" зона клика — проще попасть
+            // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ" пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             float radius = 0.2f;
             Collider2D hit = Physics2D.OverlapCircle(mousePos, radius, enemyLayer);
 
@@ -80,3 +80,4 @@ public class PlayerController : MonoBehaviour
         gameObject.SetActive(false);
     }
 }
+

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;   // если будешь грузить другую сцену
 
 public class GameManager : MonoBehaviour
 {
@@ -17,19 +18,31 @@ public class GameManager : MonoBehaviour
     public void AddCoins(int amount)
     {
         coins += amount;
-        Debug.Log("�������� �����: " + amount + " | �����: " + coins);
+        Debug.Log("Получено монет: " + amount + " | Всего: " + coins);
     }
 
     public void OnEnemyKilled()
     {
-        Debug.Log("���� ����");
-        // ����� ������� RoomManager
+        Debug.Log("Враг убит");
+        // Позже добавим RoomManager
     }
 
     public void PlayerDied()
     {
-        Debug.Log("����� ����!");
-        // ����� ������� UI ����� ������
+        Debug.Log("Игрок умер!");
+        // Позже добавим UI экран смерти
+    }
+
+    public void LevelCompleted()
+    {
+        Debug.Log("Уровень пройден! 🎉");
+
+        // Здесь можешь сделать что угодно:
+        // - загрузить сцену результатов
+        // - перейти к следующему уровню
+        // - показать UI
+        //
+        // Пример (пока закомментировано):
+        // SceneManager.LoadScene("LevelCompleteScene");
     }
 }
-

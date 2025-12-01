@@ -18,18 +18,34 @@ public class Enemy : MonoBehaviour
     [Header("Loot")]
     public GameObject lootPrefab;
 
+    private Rigidbody2D rb;  // Добавим Rigidbody для физики
+    private Collider2D enemyCollider;  // Для коллайдера
+
     private void Awake()
     {
         currentHealth = maxHealth;
+
+        rb = GetComponent<Rigidbody2D>();  // Инициализируем Rigidbody
+        enemyCollider = GetComponent<Collider2D>();  // Инициализируем Collider
+    }
+
+    private void Start()
+    {
+        if (player != null)
+        {
+            Init(player); // Передаем ссылку на игрока
+        }
     }
 
     private void Update()
     {
+        if (player == null) return;
+
         MoveTowardsPlayer();
     }
 
     /// <summary>
-    /// ���������� ����� ������ �����, ����� �������� ��� ������ �� ������
+    /// Инициализация врага с привязкой к игроку
     /// </summary>
     public void Init(Transform playerTransform)
     {
@@ -40,15 +56,28 @@ public class Enemy : MonoBehaviour
     {
         if (player == null) return;
 
+        // Направление в сторону игрока
         Vector2 direction = (player.position - transform.position).normalized;
-        transform.position += (Vector3)direction * moveSpeed * Time.deltaTime;
+
+        // Проверка на препятствия перед движением
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 0.5f, LayerMask.GetMask("Obstacles"));
+        if (hit.collider == null)
+        {
+            // Двигаем врага
+            rb.linearVelocity = direction * moveSpeed;  // Используем velocity для движения
+        }
+        else
+        {
+            // Если столкновение, останавливаем движение
+            rb.linearVelocity = Vector2.zero;
+        }
     }
 
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
 
-        // ���������� UI HP ����� (���� ����� �����)
+        // Обновляем UI HP (если требуется)
         EnemyEvents.OnEnemyHealthChanged?.Invoke(currentHealth, maxHealth);
 
         if (currentHealth <= 0)
@@ -80,6 +109,16 @@ public class Enemy : MonoBehaviour
             PlayerController player = other.GetComponent<PlayerController>();
             if (player != null)
                 player.TakeDamage(contactDamage);
+        }
+    }
+
+    // Для отладки: визуализация луча, показывающего путь
+    private void OnDrawGizmos()
+    {
+        if (player != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, player.position);
         }
     }
 }
