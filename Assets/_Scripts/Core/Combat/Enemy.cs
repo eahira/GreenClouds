@@ -12,72 +12,91 @@ public class Enemy : MonoBehaviour
     public float moveSpeed = 2f;
     private Transform player;
 
+    [Tooltip("Радиус, в котором враг вообще видит игрока")]
+    public float aggroRange = 12f;
+
+    [Tooltip("Слои, которые считаются стенами/препятствиями")]
+    public LayerMask obstacleMask;   // сюда поставим слой Obstacles
+
     [Header("Damage")]
-    public int contactDamage = 10;
+	public int contactDamage = 10;
+
+	[Header("Attack")]
+	public float attackCooldown = 0.7f;   // время между ударами по игроку, в секундах
+	private float lastAttackTime = -999f; // когда в последний раз били игрока
+
 
     [Header("Loot")]
     public GameObject lootPrefab;
-
-    private Rigidbody2D rb;  // Добавим Rigidbody для физики
-    private Collider2D enemyCollider;  // Для коллайдера
 
     private void Awake()
     {
         currentHealth = maxHealth;
 
-        rb = GetComponent<Rigidbody2D>();  // Инициализируем Rigidbody
-        enemyCollider = GetComponent<Collider2D>();  // Инициализируем Collider
-    }
-
-    private void Start()
-    {
-        if (player != null)
-        {
-            Init(player); // Передаем ссылку на игрока
-        }
+        // если не настроишь в инспекторе — подстрахуемся
+        if (obstacleMask.value == 0)
+            obstacleMask = LayerMask.GetMask("Obstacles");
     }
 
     private void Update()
     {
-        if (player == null) return;
-
         MoveTowardsPlayer();
     }
 
     /// <summary>
-    /// Инициализация врага с привязкой к игроку
+    /// Вызывается спавнером, чтобы передать ссылку на игрока
     /// </summary>
     public void Init(Transform playerTransform)
     {
         player = playerTransform;
+
+        float hpMul = 1f;
+        float dmgMul = 1f;
+
+        if (GameManager.Instance != null)
+        {
+            hpMul  = GameManager.Instance.GetEnemyHealthMultiplier();
+            dmgMul = GameManager.Instance.GetEnemyDamageMultiplier();
+        }
+
+        maxHealth = Mathf.RoundToInt(maxHealth * hpMul);
+        currentHealth = maxHealth;
+
+        contactDamage = Mathf.RoundToInt(contactDamage * dmgMul);
     }
+
 
     private void MoveTowardsPlayer()
     {
         if (player == null) return;
 
-        // Направление в сторону игрока
-        Vector2 direction = (player.position - transform.position).normalized;
+        Vector2 toPlayer = (player.position - transform.position);
+        float sqrDist = toPlayer.sqrMagnitude;
 
-        // Проверка на препятствия перед движением
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 0.5f, LayerMask.GetMask("Obstacles"));
-        if (hit.collider == null)
+        // 1) слишком далеко — даже не пытаемся агриться
+        if (sqrDist > aggroRange * aggroRange)
+            return;
+
+        // 2) проверка на стену между врагом и игроком
+        Vector2 dir = toPlayer.normalized;
+        float dist = Mathf.Sqrt(sqrDist);
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, dist, obstacleMask);
+        // Если луч упёрся во что-то на слое Obstacles ДО игрока — видимость заблокирована
+        if (hit.collider != null)
         {
-            // Двигаем врага
-            rb.linearVelocity = direction * moveSpeed;  // Используем velocity для движения
+            // есть препятствие, не двигаемся
+            return;
         }
-        else
-        {
-            // Если столкновение, останавливаем движение
-            rb.linearVelocity = Vector2.zero;
-        }
+
+        // 3) путь свободен — двигаемся к игроку
+        transform.position += (Vector3)dir * moveSpeed * Time.deltaTime;
     }
 
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
 
-        // Обновляем UI HP (если требуется)
         EnemyEvents.OnEnemyHealthChanged?.Invoke(currentHealth, maxHealth);
 
         if (currentHealth <= 0)
@@ -103,22 +122,29 @@ public class Enemy : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            PlayerController player = other.GetComponent<PlayerController>();
-            if (player != null)
-                player.TakeDamage(contactDamage);
-        }
-    }
+	{
+    	TryHitPlayer(other);
+	}
 
-    // Для отладки: визуализация луча, показывающего путь
-    private void OnDrawGizmos()
-    {
-        if (player != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, player.position);
-        }
-    }
+	private void OnTriggerStay2D(Collider2D other)
+	{
+	    // пока враг "трётся" об игрока — он тоже может бить, но не чаще, чем раз в attackCooldown
+    	TryHitPlayer(other);
+	}
+
+	private void TryHitPlayer(Collider2D other)
+	{
+    	if (!other.CompareTag("Player")) return;
+
+    	// проверяем кд
+    	if (Time.time - lastAttackTime < attackCooldown)
+        	return;
+
+    	PlayerController player = other.GetComponent<PlayerController>();
+    	if (player == null) return;
+
+    	lastAttackTime = Time.time;
+    	player.TakeDamage(contactDamage);
+	}
+
 }

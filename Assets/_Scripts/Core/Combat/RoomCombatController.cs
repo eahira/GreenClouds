@@ -46,18 +46,24 @@ public class RoomCombatController : MonoBehaviour
     }
 
     void SpawnRegularEnemies()
-    {
-        if (enemySpawner == null) return;
+	{
+    if (enemySpawner == null) return;
 
-        int min = Mathf.Max(1, baseMinEnemies);
-        int max = Mathf.Max(min, baseMaxEnemies);
+    int min = Mathf.Max(1, baseMinEnemies);
+    int max = Mathf.Max(min, baseMaxEnemies);
 
-        // при желании сюда можно воткнуть влияние сложности
-        int count = Random.Range(min, max + 1);
+    float countMul = 1f;
+    if (GameManager.Instance != null)
+        countMul = GameManager.Instance.GetEnemyCountMultiplier();
 
-        var spawned = enemySpawner.SpawnEnemies(count);
-        RegisterEnemies(spawned);
-    }
+    min = Mathf.Max(1, Mathf.RoundToInt(min * countMul));
+    max = Mathf.Max(min, Mathf.RoundToInt(max * countMul));
+
+    int count = Random.Range(min, max + 1);
+
+    var spawned = enemySpawner.SpawnEnemies(count);
+    RegisterEnemies(spawned);
+	}
 
     void SpawnBoss()
     {

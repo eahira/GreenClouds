@@ -108,7 +108,12 @@ MonoBehaviour:
   maxHealth: 10
   currentHealth: 0
   moveSpeed: 2
+  aggroRange: 12
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 8
   contactDamage: 10
+  attackCooldown: 0.8
   lootPrefab: {fileID: 6685550578039053460, guid: caa01e829a56de1439507a84b0b0278f, type: 3}
 --- !u!61 &6134006413764794620
 BoxCollider2D:

@@ -4,56 +4,62 @@ using UnityEngine.UI;
 
 public class DifficultySelector : MonoBehaviour
 {
-    // Ссылки на кнопки
     public Button easyButton;
     public Button mediumButton;
     public Button hardButton;
     public Button backButton;
     public Button acceptButton;
 
+    private DifficultyLevel selectedDifficulty = DifficultyLevel.Medium;
+
     private void Start()
     {
-        // Привязка кнопок к методам
-        easyButton.onClick.AddListener(OnEasySelected);
-        mediumButton.onClick.AddListener(OnMediumSelected);
-        hardButton.onClick.AddListener(OnHardSelected);
+        // выбор сложности
+        easyButton.onClick.AddListener(() => SelectDifficulty(DifficultyLevel.Easy));
+        mediumButton.onClick.AddListener(() => SelectDifficulty(DifficultyLevel.Medium));
+        hardButton.onClick.AddListener(() => SelectDifficulty(DifficultyLevel.Hard));
+
+        // навигация
         backButton.onClick.AddListener(OnBackPressed);
         acceptButton.onClick.AddListener(OnAcceptPressed);
+
+        // по умолчанию Medium
+        HighlightButtons();
     }
 
-    // Логика для легкой сложности
-    private void OnEasySelected()
+    private void SelectDifficulty(DifficultyLevel level)
     {
-        // Выбираем легкую сложность
-        Debug.Log("Легкий режим выбран");
-        // Добавить код для выбора легкой сложности, если нужно
+        selectedDifficulty = level;
+        HighlightButtons();
     }
 
-    // Логика для средней сложности
-    private void OnMediumSelected()
+    private void HighlightButtons()
     {
-        // Выбираем среднюю сложность
-        Debug.Log("Средний режим выбран");
-        // Добавить код для выбора средней сложности, если нужно
+        // Очень простой визуал: меняем alpha цвета
+        SetButtonState(easyButton,   selectedDifficulty == DifficultyLevel.Easy);
+        SetButtonState(mediumButton, selectedDifficulty == DifficultyLevel.Medium);
+        SetButtonState(hardButton,   selectedDifficulty == DifficultyLevel.Hard);
     }
 
-    // Логика для тяжелой сложности
-    private void OnHardSelected()
+    private void SetButtonState(Button btn, bool selected)
     {
-        // Выбираем тяжелую сложность
-        Debug.Log("Тяжелый режим выбран");
-        // Добавить код для выбора тяжелой сложности, если нужно
+        if (btn == null) return;
+
+        Color c = btn.image.color;
+        c.a = selected ? 1f : 0.5f;
+        btn.image.color = c;
     }
 
-    // Метод для возврата на сцену выбора персонажа
     private void OnBackPressed()
     {
         SceneManager.LoadScene("CharacterSelectorScene");
     }
 
-    // Метод для запуска сцены игры (SampleScene)
     private void OnAcceptPressed()
     {
+        if (GameManager.Instance != null)
+            GameManager.Instance.SetDifficulty(selectedDifficulty);
+
         SceneManager.LoadScene("SampleScene");
     }
 }
