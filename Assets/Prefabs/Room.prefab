@@ -1576,10 +1576,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoomCombatController
   enemySpawner: {fileID: 8593115427448548295}
-  bossPrefab: {fileID: 0}
-  baseMinEnemies: 3
-  baseMaxEnemies: 6
-  isBossRoom: 0
+  bossPrefab: {fileID: 5002170955887930907, guid: 0e60120f46903174e916572c05a43ba6, type: 3}
+  baseMinEnemies: 2
+  baseMaxEnemies: 4
+  isBossRoom: 1
 --- !u!1 &6524265530483077364
 GameObject:
   m_ObjectHideFlags: 0

@@ -208,7 +208,7 @@ GameObject:
   - component: {fileID: 55482400}
   - component: {fileID: 55482399}
   m_Layer: 5
-  m_Name: ItemCard_2
+  m_Name: ItemCard_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -759,7 +759,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1509,6 +1509,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShopUI
   coinsValueText: {fileID: 238691636}
+  robotPriceText: {fileID: 331751220}
+  robotBuyButton: {fileID: 2123578985}
+  angelPriceText: {fileID: 874312647}
+  angelBuyButton: {fileID: 1296700886}
 --- !u!1 &403798964
 GameObject:
   m_ObjectHideFlags: 0
@@ -3795,7 +3799,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1296700887}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 400652290}
+        m_TargetAssemblyTypeName: ShopUI, Assembly-CSharp
+        m_MethodName: OnBuyAngelPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1296700887
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5567,7 +5583,7 @@ GameObject:
   - component: {fileID: 1885071555}
   - component: {fileID: 1885071554}
   m_Layer: 5
-  m_Name: ItemCard_3
+  m_Name: ItemCard_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6427,7 +6443,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2123578986}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 400652290}
+        m_TargetAssemblyTypeName: ShopUI, Assembly-CSharp
+        m_MethodName: OnBuyRobotPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2123578986
 MonoBehaviour:
   m_ObjectHideFlags: 0

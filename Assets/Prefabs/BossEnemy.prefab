@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6134006413764794620}
   - component: {fileID: 7941860778118241005}
   m_Layer: 6
-  m_Name: Enemy
+  m_Name: BossEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0.9662907, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -105,15 +105,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3960580f1020ea1439c538e25ff73986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  maxHealth: 10
+  maxHealth: 200
   currentHealth: 0
-  moveSpeed: 1
+  moveSpeed: 2
   aggroRange: 12
   obstacleMask:
     serializedVersion: 2
     m_Bits: 8
-  contactDamage: 10
-  attackCooldown: 0.8
+  contactDamage: 25
+  attackCooldown: 1.2
   lootPrefab: {fileID: 6685550578039053460, guid: caa01e829a56de1439507a84b0b0278f, type: 3}
 --- !u!61 &6134006413764794620
 BoxCollider2D:

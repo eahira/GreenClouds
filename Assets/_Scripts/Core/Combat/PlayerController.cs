@@ -66,15 +66,17 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        Debug.Log($"Player takes {damage} damage. HP before: {currentHealth}");
-
         currentHealth -= damage;
-
+    
         PlayerEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
-
+    
+        // Показать урон над игроком
+        FloatingDamageText.Spawn(transform.position + Vector3.up * 1.0f, damage);
+    
         if (currentHealth <= 0)
             Die();
     }
+
 
 
     void Die()

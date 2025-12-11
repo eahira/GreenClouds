@@ -28,12 +28,38 @@ public class RoomManager : MonoBehaviour
 
     private void Start()
     {
+        ApplyStageSettings();
+
         roomGrid = new int[gridSizeX, gridSizeY];
         roomQueue = new Queue<Vector2Int>();
 
         Vector2Int initialRoomIndex = new Vector2Int(gridSizeX / 2, gridSizeY / 2);
         StartRoomGenerationFromRoom(initialRoomIndex);
     }
+
+    private void ApplyStageSettings()
+    {
+        if (GameManager.Instance == null) return;
+
+        int stage = GameManager.Instance.CurrentStage;
+
+        switch (stage)
+        {
+            case 1:
+                minRooms = 8;
+                maxRooms = 12;
+                break;
+            case 2:
+                minRooms = 12;
+                maxRooms = 18;
+                break;
+            case 3:
+                minRooms = 16;
+                maxRooms = 22;
+                break;
+        }
+    }
+
 
     private void Update()
     {

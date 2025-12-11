@@ -1,10 +1,49 @@
 using UnityEngine;
+using TMPro;
 
 public class FloatingDamageText : MonoBehaviour
 {
-    public static void Spawn(Vector3 position, int damage)
+    private static FloatingDamageText prefab;
+
+    [SerializeField] private TextMeshPro text;
+    [SerializeField] private float lifeTime = 0.7f;
+    [SerializeField] private float moveSpeed = 1.5f;
+
+    /// <summary>
+    /// РЎРїР°РІРЅ С‚РµРєСЃС‚Р° СѓСЂРѕРЅР° РІ РјРёСЂРµ.
+    /// </summary>
+    public static void Spawn(Vector3 worldPos, int damage)
     {
-        Debug.Log("Урон: " + damage + " в точке " + position);
-        // Позже здесь будет красивый визуальный эффект
+        // РіСЂСѓР·РёРј РїСЂРµС„Р°Р± РёР· Resources/FloatingDamageText РѕРґРёРЅ СЂР°Р·
+        if (prefab == null)
+        {
+            prefab = Resources.Load<FloatingDamageText>("FloatingDamageText");
+            if (prefab == null)
+            {
+                Debug.LogWarning("FloatingDamageText prefab not found in Resources/FloatingDamageText");
+                return;
+            }
+        }
+
+        FloatingDamageText instance = Instantiate(prefab, worldPos, Quaternion.identity);
+        instance.Setup(damage);
+    }
+
+    public void Setup(int damage)
+    {
+        if (text == null)
+            text = GetComponent<TextMeshPro>();
+
+        text.text = "-" + damage.ToString();
+    }
+
+    private void Update()
+    {
+        // РїРѕРґРЅРёРјР°РµРј С‚РµРєСЃС‚ РІРІРµСЂС…
+        transform.position += Vector3.up * moveSpeed * Time.deltaTime;
+
+        lifeTime -= Time.deltaTime;
+        if (lifeTime <= 0f)
+            Destroy(gameObject);
     }
 }
