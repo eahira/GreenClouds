@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-            // Чуть более "толстая" зона клика — проще попасть
+            // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ" пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             float radius = 0.2f;
             Collider2D hit = Physics2D.OverlapCircle(mousePos, radius, enemyLayer);
 
@@ -67,12 +67,17 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
-
+    
         PlayerEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
-
+    
+        // РџРѕРєР°Р·Р°С‚СЊ СѓСЂРѕРЅ РЅР°Рґ РёРіСЂРѕРєРѕРј
+        FloatingDamageText.Spawn(transform.position + Vector3.up * 1.0f, damage);
+    
         if (currentHealth <= 0)
             Die();
     }
+
+
 
     void Die()
     {
@@ -80,3 +85,4 @@ public class PlayerController : MonoBehaviour
         gameObject.SetActive(false);
     }
 }
+

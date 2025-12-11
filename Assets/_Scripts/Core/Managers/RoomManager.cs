@@ -24,14 +24,42 @@ public class RoomManager : MonoBehaviour
 
     private bool generationComplete = false;
 
+    public Transform player;  // Ссылка на игрока
+
     private void Start()
     {
+        ApplyStageSettings();
+
         roomGrid = new int[gridSizeX, gridSizeY];
         roomQueue = new Queue<Vector2Int>();
 
         Vector2Int initialRoomIndex = new Vector2Int(gridSizeX / 2, gridSizeY / 2);
         StartRoomGenerationFromRoom(initialRoomIndex);
     }
+
+    private void ApplyStageSettings()
+    {
+        if (GameManager.Instance == null) return;
+
+        int stage = GameManager.Instance.CurrentStage;
+
+        switch (stage)
+        {
+            case 1:
+                minRooms = 8;
+                maxRooms = 12;
+                break;
+            case 2:
+                minRooms = 12;
+                maxRooms = 18;
+                break;
+            case 3:
+                minRooms = 16;
+                maxRooms = 22;
+                break;
+        }
+    }
+
 
     private void Update()
     {
@@ -55,9 +83,11 @@ public class RoomManager : MonoBehaviour
         {
             Debug.Log($"Generation complete, {roomCount} rooms created");
             generationComplete = true;
+
+            // Вызовем метод настройки боёвки и босса
+            SetupRoomsCombatAndBoss();
         }
     }
-    
 
     private void StartRoomGenerationFromRoom(Vector2Int roomIndex)
     {
@@ -66,15 +96,16 @@ public class RoomManager : MonoBehaviour
         int y = roomIndex.y;
         roomGrid[x, y] = 1;
         roomCount++;
+
         var initialRoom = Instantiate(roomPrefab, GetPositionFromGridIndex(roomIndex), Quaternion.identity);
         initialRoom.name = $"Room-{roomCount}";
-        initialRoom.GetComponent<Room>().RoomIndex = roomIndex;
+        var roomScript = initialRoom.GetComponent<Room>();
+        roomScript.RoomIndex = roomIndex;
         roomObjects.Add(initialRoom);
     }
 
-
     private bool TryGenerateRoom(Vector2Int roomIndex)
-    { 
+    {
         int x = roomIndex.x;
         int y = roomIndex.y;
 
@@ -123,32 +154,57 @@ public class RoomManager : MonoBehaviour
         Room topRoomScript = GetRoomScriptAt(new Vector2Int(x, y + 1));
         Room bottomRoomScript = GetRoomScriptAt(new Vector2Int(x, y - 1));
 
-        //����� ����� ���������
-        if (x > 0 && roomGrid[x - 1, y] != 0)
+        // ЛЕВЫЙ СОСЕД
+        if (x > 0 && roomGrid[x - 1, y] != 0 && leftRoomScript != null)
         {
-            //�����
             newRoomScript.OpenDoor(Vector2Int.left);
             leftRoomScript.OpenDoor(Vector2Int.right);
-        }
-        if (x < gridSizeX - 1 && roomGrid[x + 1, y] != 0)
-        {
-            //������
-            newRoomScript.OpenDoor(Vector2Int.right);
-            rightRoomScript.OpenDoor(Vector2Int.left);
-        }
-        if (y > 0 && roomGrid[x, y - 1] != 0) 
-        {
-            //�����
-            newRoomScript.OpenDoor(Vector2Int.down);
-            bottomRoomScript.OpenDoor(Vector2Int.up);
-        }
-        if (y < gridSizeY - 1 && roomGrid[x, y + 1] != 0)
-        {
-            //������
-            newRoomScript.OpenDoor(Vector2Int.up);
-            topRoomScript.OpenDoor(Vector2Int.down);
+
+            if (newRoomScript.LeftPortal != null && leftRoomScript.EntryFromRight != null)
+                newRoomScript.LeftPortal.targetSpawnPoint = leftRoomScript.EntryFromRight;
+
+            if (leftRoomScript.RightPortal != null && newRoomScript.EntryFromLeft != null)
+                leftRoomScript.RightPortal.targetSpawnPoint = newRoomScript.EntryFromLeft;
         }
 
+        // ПРАВЫЙ СОСЕД
+        if (x < gridSizeX - 1 && roomGrid[x + 1, y] != 0 && rightRoomScript != null)
+        {
+            newRoomScript.OpenDoor(Vector2Int.right);
+            rightRoomScript.OpenDoor(Vector2Int.left);
+
+            if (newRoomScript.RightPortal != null && rightRoomScript.EntryFromLeft != null)
+                newRoomScript.RightPortal.targetSpawnPoint = rightRoomScript.EntryFromLeft;
+
+            if (rightRoomScript.LeftPortal != null && newRoomScript.EntryFromRight != null)
+                rightRoomScript.LeftPortal.targetSpawnPoint = newRoomScript.EntryFromRight;
+        }
+
+        // НИЖНИЙ СОСЕД
+        if (y > 0 && roomGrid[x, y - 1] != 0 && bottomRoomScript != null)
+        {
+            newRoomScript.OpenDoor(Vector2Int.down);
+            bottomRoomScript.OpenDoor(Vector2Int.up);
+
+            if (newRoomScript.BottomPortal != null && bottomRoomScript.EntryFromTop != null)
+                newRoomScript.BottomPortal.targetSpawnPoint = bottomRoomScript.EntryFromTop;
+
+            if (bottomRoomScript.TopPortal != null && newRoomScript.EntryFromBottom != null)
+                bottomRoomScript.TopPortal.targetSpawnPoint = newRoomScript.EntryFromBottom;
+        }
+
+        // ВЕРХНИЙ СОСЕД
+        if (y < gridSizeY - 1 && roomGrid[x, y + 1] != 0 && topRoomScript != null)
+        {
+            newRoomScript.OpenDoor(Vector2Int.up);
+            topRoomScript.OpenDoor(Vector2Int.down);
+
+            if (newRoomScript.TopPortal != null && topRoomScript.EntryFromBottom != null)
+                newRoomScript.TopPortal.targetSpawnPoint = topRoomScript.EntryFromBottom;
+
+            if (topRoomScript.BottomPortal != null && newRoomScript.EntryFromTop != null)
+                topRoomScript.BottomPortal.targetSpawnPoint = newRoomScript.EntryFromTop;
+        }
     }
 
     Room GetRoomScriptAt(Vector2Int index)
@@ -159,21 +215,19 @@ public class RoomManager : MonoBehaviour
         return null;
     }
 
-
     private int CountAdjacentRooms(Vector2Int roomIndex)
     {
         int x = roomIndex.x;
         int y = roomIndex.y;
         int count = 0;
 
-        if (x > 0 && roomGrid[x - 1, y] != 0) count++; //�����
-        if (x < gridSizeX - 1 && roomGrid[x + 1, y] != 0) count++; //������
-        if (y > 0 && roomGrid[x, y - 1] != 0) count++; //�����
-        if (y < gridSizeY - 1 && roomGrid[x, y + 1] != 0) count++; //������
+        if (x > 0 && roomGrid[x - 1, y] != 0) count++; 
+        if (x < gridSizeX - 1 && roomGrid[x + 1, y] != 0) count++; 
+        if (y > 0 && roomGrid[x, y - 1] != 0) count++; 
+        if (y < gridSizeY - 1 && roomGrid[x, y + 1] != 0) count++; 
 
         return count;
     }
-
 
     private Vector3 GetPositionFromGridIndex(Vector2Int gridIndex)
     {
@@ -195,6 +249,65 @@ public class RoomManager : MonoBehaviour
                 Gizmos.DrawWireCube(position, new Vector3(roomWidth, roomHeight, 1));
             }
         }
+    }
 
+    // Новый метод для настройки боёвки и босс-рума
+    void SetupRoomsCombatAndBoss()
+    {
+        if (roomObjects == null || roomObjects.Count == 0)
+            return;
+
+        // ищем игрока, если не назначен в инспекторе
+        if (player == null)
+        {
+            var playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+                player = playerObj.transform;
+        }
+
+        if (player == null)
+        {
+            Debug.LogWarning("RoomManager: player не назначен, комбат в комнатах не будет настроен");
+            return;
+        }
+
+        // считаем, что первая созданная комната — стартовая
+        Room startRoom = roomObjects[0].GetComponent<Room>();
+        if (startRoom == null)
+            return;
+
+        Vector2Int startIndex = startRoom.RoomIndex;
+
+        // ищем самую дальнюю комнату от стартовой по манхэттенскому расстоянию
+        GameObject bossRoomObj = null;
+        int maxDistance = -1;
+
+        foreach (var roomObj in roomObjects)
+        {
+            Room r = roomObj.GetComponent<Room>();
+            if (r == null) continue;
+
+            int dist = Mathf.Abs(r.RoomIndex.x - startIndex.x) +
+                       Mathf.Abs(r.RoomIndex.y - startIndex.y);
+
+            if (dist > maxDistance)
+            {
+                maxDistance = dist;
+                bossRoomObj = roomObj;
+            }
+        }
+
+        // настраиваем боёвку во всех комнатах
+        foreach (var roomObj in roomObjects)
+        {
+            RoomCombatController combat = roomObj.GetComponent<RoomCombatController>();
+            if (combat == null) continue;
+
+            bool isBoss = (roomObj == bossRoomObj);
+            combat.Setup(player, isBoss);
+        }
+
+        if (bossRoomObj != null)
+            Debug.Log("Boss room: " + bossRoomObj.name);
     }
 }
