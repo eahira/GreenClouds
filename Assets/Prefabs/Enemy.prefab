@@ -111,7 +111,7 @@ MonoBehaviour:
   aggroRange: 12
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
   contactDamage: 10
   attackCooldown: 0.8
   lootPrefab: {fileID: 6685550578039053460, guid: caa01e829a56de1439507a84b0b0278f, type: 3}

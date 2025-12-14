@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    private Room myRoom;
+
     public event System.Action<Enemy> OnEnemyDied;
 
     [Header("Stats")]
@@ -13,7 +15,7 @@ public class Enemy : MonoBehaviour
     private Transform player;
 
     [Tooltip("Радиус, в котором враг вообще видит игрока")]
-    public float aggroRange = 12f;
+    public float aggroRange = 6f;
 
     [Tooltip("Слои, которые считаются стенами/препятствиями")]
     public LayerMask obstacleMask;   // сюда поставим слой Obstacles
@@ -32,6 +34,8 @@ public class Enemy : MonoBehaviour
     private void Awake()
     {
         currentHealth = maxHealth;
+
+        myRoom = GetComponentInParent<Room>();
 
         // если не настроишь в инспекторе — подстрахуемся
         if (obstacleMask.value == 0)
@@ -69,6 +73,10 @@ public class Enemy : MonoBehaviour
     private void MoveTowardsPlayer()
     {
         if (player == null) return;
+
+        // игрок не в нашей комнате — не двигаемся
+        if (CurrentRoomTracker.CurrentRoom != null && myRoom != null && CurrentRoomTracker.CurrentRoom != myRoom)
+            return;
 
         Vector2 toPlayer = (player.position - transform.position);
         float sqrDist = toPlayer.sqrMagnitude;

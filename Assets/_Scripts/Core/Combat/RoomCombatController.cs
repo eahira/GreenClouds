@@ -92,7 +92,7 @@ public class RoomCombatController : MonoBehaviour
         }
 
         Vector3 pos = enemySpawner != null ? enemySpawner.transform.position : transform.position;
-        GameObject bossObj = Object.Instantiate(bossPrefab, pos, Quaternion.identity);
+        GameObject bossObj = Object.Instantiate(bossPrefab, pos, Quaternion.identity, transform);
 
         Enemy bossEnemy = bossObj.GetComponent<Enemy>();
         if (bossEnemy != null)

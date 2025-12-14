@@ -24,7 +24,7 @@ public class EnemySpawner : MonoBehaviour
 
             Transform point = spawnPoints[Random.Range(0, spawnPoints.Length)];
 
-            GameObject obj = Instantiate(enemyPrefab, point.position, Quaternion.identity);
+            GameObject obj = Instantiate(enemyPrefab, point.position, Quaternion.identity, transform);
             Enemy enemy = obj.GetComponent<Enemy>();
 
             if (enemy != null && player != null)
