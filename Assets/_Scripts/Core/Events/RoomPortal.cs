@@ -5,27 +5,34 @@ public class RoomPortal : MonoBehaviour
     [Header("Куда телепортировать игрока")]
     public Transform targetSpawnPoint;
 
-    // анти-пинг-понг
-    private static float lastTeleportTime = -999f;
+    [Header("Анти-пинг-понг (глобально для всех порталов)")]
     public float teleportCooldown = 0.2f;
+
+    private static float globalLastTeleportTime = -999f;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
 
-        // если только что уже телепортились — выходим
-        if (Time.time - lastTeleportTime < teleportCooldown)
-            return;
-
         if (targetSpawnPoint == null)
         {
-            Debug.LogWarning("RoomPortal: targetSpawnPoint не назначен у " + name);
+            Debug.LogWarning($"RoomPortal ({name}): targetSpawnPoint не назначен");
             return;
         }
 
-        other.transform.position = targetSpawnPoint.position;
-        lastTeleportTime = Time.time;
+        // защита на случай, если статика пережила Play (Time.time снова с нуля)
+        if (Time.time < globalLastTeleportTime)
+            globalLastTeleportTime = -999f;
 
-        Debug.Log($"RoomPortal: телепортируем игрока через {name} в {targetSpawnPoint.position}");
+        // глобальный кд, чтобы не телепортировать сразу назад/туда же
+        if (Time.time - globalLastTeleportTime < teleportCooldown)
+            return;
+
+        other.transform.position = targetSpawnPoint.position;
+        globalLastTeleportTime = Time.time;
+
+        Room targetRoom = targetSpawnPoint.GetComponentInParent<Room>();
+        if (targetRoom != null && RoomCameraController.Instance != null)
+            RoomCameraController.Instance.SetRoom(targetRoom);
     }
 }
