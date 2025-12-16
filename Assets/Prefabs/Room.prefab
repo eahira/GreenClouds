@@ -149,7 +149,7 @@ GameObject:
   - component: {fileID: 3324465528901777668}
   - component: {fileID: 2236875492579933137}
   - component: {fileID: 338329978968749509}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: LeftWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -286,7 +286,7 @@ GameObject:
   - component: {fileID: 7288689466288963957}
   - component: {fileID: 9183986587281683747}
   - component: {fileID: 7465151574074085703}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: RightWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -776,7 +776,7 @@ GameObject:
   - component: {fileID: 7148305081438463333}
   - component: {fileID: 8494674528088835599}
   - component: {fileID: 8996230450799199438}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: TopWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1724,6 +1724,15 @@ MonoBehaviour:
   - {fileID: 1170625791718347199}
   enemyPrefab: {fileID: 5002170955887930907, guid: 4e5eecd89a8c0a0418e2ac52802b2e71, type: 3}
   player: {fileID: 0}
+  spawnJitterRadius: 1.2
+  minSpawnDistance: 0.9
+  maxAttemptsPerEnemy: 12
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 64
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1 &6569649050226795125
 GameObject:
   m_ObjectHideFlags: 0
@@ -1956,7 +1965,7 @@ GameObject:
   - component: {fileID: 2842703729194638885}
   - component: {fileID: 4891170712445745593}
   - component: {fileID: 2914127052778928431}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: BottomWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}

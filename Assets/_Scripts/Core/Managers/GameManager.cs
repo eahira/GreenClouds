@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// Уровни сложности игры
 public enum DifficultyLevel
 {
     Easy,
@@ -9,10 +8,9 @@ public enum DifficultyLevel
     Hard
 }
 
-/// Типы персонажей
 public enum CharacterType
 {
-    Survivor,   // Выживший
+    Survivor,
     Robot,
     Angel
 }
@@ -21,28 +19,24 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    // ----------------- Экономика -----------------
     [Header("Economy")]
     public int coins = 0;
 
-    // ----------------- Разблокировка персонажей -----------------
     [Header("Characters unlock")]
     public bool robotUnlocked = false;
     public bool angelUnlocked = false;
     public int robotPrice = 500;
     public int angelPrice = 800;
 
-    // ----------------- Выбор персонажа и прогресс -----------------
     [Header("Character selection & progress")]
     public CharacterType selectedCharacter = CharacterType.Survivor;
 
-    [Range(1, 3)] public int survivorStage = 1; // 1..3
+    [Range(1, 3)] public int survivorStage = 1;
     [Range(1, 3)] public int robotStage = 1;
     [Range(1, 3)] public int angelStage = 1;
 
     public const int MaxStage = 3;
 
-    /// Текущий уровень (1..3) для выбранного героя
     public int CurrentStage
     {
         get
@@ -66,7 +60,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // ----------------- Сложность -----------------
     [Header("Difficulty")]
     public DifficultyLevel CurrentDifficulty { get; private set; } = DifficultyLevel.Medium;
 
@@ -80,11 +73,12 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        // Страховка: чтобы ArtifactManager точно существовал на GameManager
+        if (GetComponent<ArtifactManager>() == null)
+            gameObject.AddComponent<ArtifactManager>();
     }
 
-    // =========================
-    //      ВЫБОР ПЕРСОНАЖА
-    // =========================
     public void SelectCharacter(CharacterType type)
     {
         selectedCharacter = type;
@@ -101,9 +95,6 @@ public class GameManager : MonoBehaviour
             CurrentStage++;
     }
 
-    // =========================
-    //          МОНЕТЫ
-    // =========================
     public void AddCoins(int amount)
     {
         coins += amount;
@@ -138,16 +129,12 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    // =========================
-    //         DIFFICULTY
-    // =========================
     public void SetDifficulty(DifficultyLevel level)
     {
         CurrentDifficulty = level;
         Debug.Log($"Difficulty set to: {CurrentDifficulty}");
     }
 
-    // множитель здоровья врагов по сложности
     public float GetEnemyHealthMultiplier()
     {
         switch (CurrentDifficulty)
@@ -158,7 +145,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // множитель количества врагов по сложности
     public float GetEnemyCountMultiplier()
     {
         switch (CurrentDifficulty)
@@ -169,53 +155,50 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // множитель количества врагов по ЭТАПУ (1/2/3)
     public float GetEnemyDamageMultiplier()
-	{
-    	switch (CurrentDifficulty)
-    	{
-        	case DifficultyLevel.Easy:  return 0.8f;  // на лёгком враги бьют слабее
-        	case DifficultyLevel.Hard:  return 1.3f;  // на сложном — сильнее
-        	default:                    return 1.0f;  // Medium
-    	}
-	}
-	
+    {
+        switch (CurrentDifficulty)
+        {
+            case DifficultyLevel.Easy: return 0.8f;
+            case DifficultyLevel.Hard: return 1.3f;
+            default: return 1.0f;
+        }
+    }
 
-    // =========================
-    //        GAME FLOW
-    // =========================
     public void OnEnemyKilled()
     {
         Debug.Log("Enemy killed");
-        // сюда потом добавим статистику, квесты и т.п.
     }
 
-    /// Игрок умер → уровень героя сбрасываем на 1 и показываем экран поражения
+    // Умер = конец забега => сбрасываем артефакты и стадию
     public void PlayerDied()
     {
         Debug.Log("Player died");
-        ResetCurrentStage();                 // сбрасываем прогресс героя
+
+        GetComponent<ArtifactManager>()?.ResetRun(); // <-- ВАЖНО
+
+        ResetCurrentStage();
         SceneManager.LoadScene("DefeatScene");
     }
 
-    /// Босс убит → либо LevelComplete, либо FinalWin
+    // Босс убит => показываем окно (LevelCompleteScene) после 1/2 босса,
+    // после 3 босса => финал и сброс забега
     public void LevelCompleted()
-{
-    Debug.Log($"Level {CurrentStage} completed");
-
-    if (CurrentStage < MaxStage)
     {
-        // Прошли уровень 1 или 2
-        SceneManager.LoadScene("LevelCompleteScene");
-    }
-    else
-    {
-        // Прошли финальный (3) уровень для текущего персонажа
-        // Забег для этого героя должен начаться с 1 уровня в следующий раз
-        ResetCurrentStage();
+        Debug.Log($"Level {CurrentStage} completed");
 
-        SceneManager.LoadScene("FinalWinScene");
-    }
-}
+        if (CurrentStage < MaxStage)
+        {
+            // 1 или 2 босс: забег продолжается, артефакты НЕ сбрасываем
+            SceneManager.LoadScene("LevelCompleteScene");
+        }
+        else
+        {
+            // 3 босс: конец забега => сбрасываем артефакты
+            GetComponent<ArtifactManager>()?.ResetRun(); // <-- ВАЖНО
 
+            ResetCurrentStage();
+            SceneManager.LoadScene("FinalWinScene");
+        }
+    }
 }

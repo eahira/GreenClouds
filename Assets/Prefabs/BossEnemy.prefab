@@ -111,10 +111,17 @@ MonoBehaviour:
   aggroRange: 12
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
   contactDamage: 25
   attackCooldown: 1.2
-  lootPrefab: {fileID: 6685550578039053460, guid: caa01e829a56de1439507a84b0b0278f, type: 3}
+  coinPrefab: {fileID: 6685550578039053460, guid: caa01e829a56de1439507a84b0b0278f, type: 3}
+  healPrefab: {fileID: 4434309758655328118, guid: 5c449bb75b4a99a49acb34181fa8b69f, type: 3}
+  artifactPickupPrefab: {fileID: 2242204682470391116, guid: 888588580283ba14281b67453ca754f1, type: 3}
+  coinChance: 0
+  healChance: 0
+  artifactChance: 0
+  artifactPool: []
+  dropScatterRadius: 0.6
 --- !u!61 &6134006413764794620
 BoxCollider2D:
   m_ObjectHideFlags: 0
