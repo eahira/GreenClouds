@@ -3369,6 +3369,7 @@ GameObject:
   - component: {fileID: 1905374650}
   - component: {fileID: 1905374651}
   - component: {fileID: 1905374652}
+  - component: {fileID: 1905374653}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -3516,6 +3517,9 @@ MonoBehaviour:
   clickDamage: 1
   ultimateSystem: {fileID: 0}
   ghostShieldHpThreshold: 0.3
+  blessingRegenPerSecond: 1
+  blessingIdleSpeedThreshold: 0.05
+  blessingStartDelay: 0.25
 --- !u!50 &1905374650
 Rigidbody2D:
   serializedVersion: 5
@@ -3574,6 +3578,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactEffectSystem
   sparkMaxBonus: 1
+--- !u!114 &1905374653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905374645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1545c6d522b99844f8919995c784b663, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShadowCloudEffect
+  radius: 2.5
+  stunDuration: 1.2
+  cooldown: 3
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &1919195455
 GameObject:
   m_ObjectHideFlags: 0

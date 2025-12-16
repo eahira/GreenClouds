@@ -130,6 +130,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 37f2ac7b4b6d9734689890f8422e99a9, type: 2}
   - {fileID: 11400000, guid: 2595bf8d8ad87c74a88ceafc41562873, type: 2}
   - {fileID: 11400000, guid: 6ab454a08aee72940bfa1a4267e0ce4a, type: 2}
+  - {fileID: 11400000, guid: 149bd60da2bab9141addb2c1ffb93d3c, type: 2}
   dropScatterRadius: 0.6
 --- !u!61 &6134006413764794620
 BoxCollider2D:

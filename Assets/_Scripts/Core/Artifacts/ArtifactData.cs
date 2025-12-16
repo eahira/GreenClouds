@@ -5,7 +5,8 @@ public enum ArtifactEffectType
     None,
     SparkOfHope,
     Blessing,
-    GhostShield
+    GhostShield,
+    ShadowCloud
 }
 
 [CreateAssetMenu(menuName = "GreenClouds/Artifact")]

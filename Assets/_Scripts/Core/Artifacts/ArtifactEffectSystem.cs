@@ -8,29 +8,31 @@ public class ArtifactEffectSystem : MonoBehaviour
     public float sparkMaxBonus = 1.0f;
 
     private bool hasSpark;
-
     private PlayerController player;
+    private ArtifactManager am;
 
     private void Awake()
     {
         player = GetComponent<PlayerController>();
+        am = GameManager.Instance != null ? GameManager.Instance.GetComponent<ArtifactManager>() : null;
     }
 
     private void OnEnable()
     {
-        ArtifactManager.OnArtifactsChanged += HandleArtifactsChanged;
+        if (am != null)
+            am.OnArtifactsChanged += HandleArtifactsChanged;
     }
 
     private void OnDisable()
     {
-        ArtifactManager.OnArtifactsChanged -= HandleArtifactsChanged;
+        if (am != null)
+            am.OnArtifactsChanged -= HandleArtifactsChanged;
     }
 
     private void Start()
     {
-        // на случай, если артефакты уже есть
-        var am = GameManager.Instance != null ? GameManager.Instance.GetComponent<ArtifactManager>() : null;
-        if (am != null) HandleArtifactsChanged(am.Artifacts);
+        if (am != null)
+            HandleArtifactsChanged(am.Artifacts);
     }
 
     private void HandleArtifactsChanged(IReadOnlyList<ArtifactData> artifacts)
@@ -49,9 +51,6 @@ public class ArtifactEffectSystem : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Модифицируем урон клика с учётом артефактов
-    /// </summary>
     public int ModifyClickDamage(int baseDamage)
     {
         if (player == null) return baseDamage;
@@ -61,8 +60,8 @@ public class ArtifactEffectSystem : MonoBehaviour
         if (hasSpark)
         {
             float hpRatio = (player.maxHealth > 0) ? (float)player.currentHealth / player.maxHealth : 1f;
-            float missing = 1f - Mathf.Clamp01(hpRatio);        // 0..1
-            float mult = 1f + sparkMaxBonus * missing;          // 1..(1+sparkMaxBonus)
+            float missing = 1f - Mathf.Clamp01(hpRatio);
+            float mult = 1f + sparkMaxBonus * missing;
             damage *= mult;
         }
 

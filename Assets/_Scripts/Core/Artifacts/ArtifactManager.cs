@@ -9,11 +9,9 @@ public class ArtifactManager : MonoBehaviour
     [SerializeField] private List<ArtifactData> artifacts = new List<ArtifactData>(MaxSlots);
     public IReadOnlyList<ArtifactData> Artifacts => artifacts;
 
-    // “Уже выпадало/получали в этом забеге”
     private readonly HashSet<ArtifactData> obtainedThisRun = new HashSet<ArtifactData>();
 
-    // Чтобы эффекты/UI могли обновляться
-    public static Action<IReadOnlyList<ArtifactData>> OnArtifactsChanged;
+    public event Action<IReadOnlyList<ArtifactData>> OnArtifactsChanged;
 
     public void ResetRun()
     {
@@ -24,14 +22,15 @@ public class ArtifactManager : MonoBehaviour
 
     public bool HasArtifact(ArtifactEffectType type)
     {
-        foreach (var a in artifacts)
+        for (int i = 0; i < artifacts.Count; i++)
+        {
+            var a = artifacts[i];
             if (a != null && a.effectType == type)
                 return true;
+        }
         return false;
     }
 
-
-    // Вызываем при ДРОПЕ (чтобы не дублировалось на полу)
     public void MarkObtainedThisRun(ArtifactData data)
     {
         if (data != null) obtainedThisRun.Add(data);
@@ -42,7 +41,6 @@ public class ArtifactManager : MonoBehaviour
         return data != null && obtainedThisRun.Contains(data);
     }
 
-    // Вызывается при ПОДБОРЕ
     public void Pickup(ArtifactData data)
     {
         if (data == null) return;
@@ -50,9 +48,7 @@ public class ArtifactManager : MonoBehaviour
         obtainedThisRun.Add(data);
 
         if (artifacts.Count < MaxSlots)
-        {
             artifacts.Add(data);
-        }
         else
         {
             artifacts.RemoveAt(0);

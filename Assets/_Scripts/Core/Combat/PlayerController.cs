@@ -18,11 +18,23 @@ public class PlayerController : MonoBehaviour
     public UltimateSystem ultimateSystem;
 
     [Header("Ghost Shield")]
-    public float ghostShieldHpThreshold = 0.3f; // 30% HP
+    [Range(0.05f, 0.95f)]
+    public float ghostShieldHpThreshold = 0.3f;
     private bool ghostShieldReady = true;
     private bool ghostShieldActive = false;
 
+    [Header("Blessing Regen (only when idle)")]
+    public float blessingRegenPerSecond = 1.0f;      // рекомендую 0.5..1.0
+    public float blessingIdleSpeedThreshold = 0.08f; // чуть выше, чтобы точно не хилить “в движении”
+    public float blessingStartDelay = 0.25f;
+    private float blessingIdleTimer = 0f;
+    private float blessingRegenAccumulator = 0f;
+
     private ArtifactManager artifactManager;
+
+    // считаем реальную скорость через дельту позиции (работает даже с MovePosition/kinematic)
+    private Vector2 _prevPos;
+    private float _speedSqr;
 
     private void Start()
     {
@@ -33,6 +45,65 @@ public class PlayerController : MonoBehaviour
             ultimateSystem = GetComponent<UltimateSystem>();
 
         artifactManager = GameManager.Instance != null ? GameManager.Instance.GetComponent<ArtifactManager>() : null;
+
+        _prevPos = rb != null ? rb.position : (Vector2)transform.position;
+    }
+
+    private void Update()
+    {
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
+
+        CheckForEnemyClick();
+    }
+
+    private void FixedUpdate()
+    {
+        Vector2 curPos = rb != null ? rb.position : (Vector2)transform.position;
+        Vector2 step = movement.normalized * moveSpeed * Time.fixedDeltaTime;
+
+        if (rb != null)
+            rb.MovePosition(curPos + step);
+        else
+            transform.position += (Vector3)step;
+
+        // реальная скорость = deltaPos / dt
+        Vector2 newPos = rb != null ? rb.position : (Vector2)transform.position;
+        Vector2 delta = newPos - _prevPos;
+        _speedSqr = (delta / Time.fixedDeltaTime).sqrMagnitude;
+        _prevPos = newPos;
+
+        UpdateBlessingRegen();
+    }
+
+    private void UpdateBlessingRegen()
+    {
+        if (artifactManager == null) return;
+        if (!artifactManager.HasArtifact(ArtifactEffectType.Blessing)) return;
+        if (currentHealth <= 0) return;
+
+        float threshSqr = blessingIdleSpeedThreshold * blessingIdleSpeedThreshold;
+        bool isIdle = _speedSqr <= threshSqr;
+
+        if (!isIdle)
+        {
+            blessingIdleTimer = 0f;
+            blessingRegenAccumulator = 0f;
+            return;
+        }
+
+        blessingIdleTimer += Time.fixedDeltaTime;
+        if (blessingIdleTimer < blessingStartDelay)
+            return;
+
+        blessingRegenAccumulator += blessingRegenPerSecond * Time.fixedDeltaTime;
+
+        int healInt = Mathf.FloorToInt(blessingRegenAccumulator);
+        if (healInt > 0)
+        {
+            Heal(healInt);
+            blessingRegenAccumulator -= healInt;
+        }
     }
 
     private void CheckGhostShield()
@@ -53,62 +124,37 @@ public class PlayerController : MonoBehaviour
             ghostShieldReady = true;
     }
 
-    private void Update()
+    private void CheckForEnemyClick()
     {
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
+        if (!Input.GetMouseButtonDown(0)) return;
 
-        CheckForEnemyClick();
-    }
+        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        float radius = 0.2f;
+        Collider2D hit = Physics2D.OverlapCircle(mousePos, radius, enemyLayer);
 
-    private void FixedUpdate()
-    {
-        if (rb != null)
-            rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
-        else
-            transform.position += (Vector3)movement.normalized * moveSpeed * Time.deltaTime;
-    }
+        if (hit == null) return;
 
-    void CheckForEnemyClick()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Enemy enemy = hit.GetComponent<Enemy>();
+        if (enemy == null) return;
 
-            // ���� ����� "�������" ���� ����� � ����� �������
-            float radius = 0.2f;
-            Collider2D hit = Physics2D.OverlapCircle(mousePos, radius, enemyLayer);
+        int dmg = clickDamage;
 
-            if (hit != null)
-            {
-                Enemy enemy = hit.GetComponent<Enemy>();
-                if (enemy != null)
-                {
-                    int dmg = clickDamage;
+        var effects = GetComponent<ArtifactEffectSystem>();
+        if (effects != null)
+            dmg = effects.ModifyClickDamage(clickDamage);
 
-                    var effects = GetComponent<ArtifactEffectSystem>();
-                    if (effects != null)
-                        dmg = effects.ModifyClickDamage(clickDamage);
-
-                    enemy.TakeDamage(dmg);
-
-                    ultimateSystem?.AddCharge(1);
-                }
-            }
-        }
+        enemy.TakeDamage(dmg);
+        ultimateSystem?.AddCharge(1);
     }
 
     public void TakeDamage(int damage)
     {
-        // 🛡️ GhostShield: если активен — блокируем весь урон, но оставляем визуал/ивенты как надо
+        // GhostShield блокирует один удар
         if (ghostShieldActive)
         {
             ghostShieldActive = false;
 
-            // Можно показать "0" чтобы игрок понял что удар был заблокирован
             FloatingDamageText.Spawn(transform.position + Vector3.up * 1.0f, 0);
-
-            // ХП не меняется, но можно все равно дернуть эвент, чтобы UI не рассинхронизировался
             PlayerEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
 
             Debug.Log("Ghost Shield absorbed damage!");
@@ -118,8 +164,6 @@ public class PlayerController : MonoBehaviour
         currentHealth -= damage;
 
         PlayerEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
-
-        // Показать урон над игроком
         FloatingDamageText.Spawn(transform.position + Vector3.up * 1.0f, damage);
 
         if (currentHealth <= 0)
@@ -128,17 +172,30 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // Проверяем, надо ли включить щит по порогу HP
+        // ShadowCloud: срабатывает при получении урона
+        var cloud = GetComponent<ShadowCloudEffect>();
+        if (cloud != null)
+            cloud.OnPlayerDamaged();
+
         CheckGhostShield();
     }
 
+    public void Heal(int amount)
+    {
+        if (amount <= 0) return;
 
+        int before = currentHealth;
+        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
 
+        if (currentHealth != before)
+            PlayerEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
 
-    void Die()
+        CheckGhostShield();
+    }
+
+    private void Die()
     {
         GameManager.Instance.PlayerDied();
         gameObject.SetActive(false);
     }
 }
-

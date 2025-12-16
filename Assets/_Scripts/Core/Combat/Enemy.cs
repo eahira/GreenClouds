@@ -53,12 +53,14 @@ public class Enemy : MonoBehaviour
     [Header("Drop Scatter")]
     public float dropScatterRadius = 0.6f;
 
+    // stun
+    private float stunUntil = -1f;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
 
-        // IMPORTANT: иногда myRoom может быть null при Awake (зависит от иерархии/спавна)
         myRoom = GetComponentInParent<Room>();
 
         if (obstacleMask.value == 0)
@@ -70,7 +72,6 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        // страховка: если Init не успел / игрок не проставился
         if (player == null)
         {
             var p = GameObject.FindGameObjectWithTag("Player");
@@ -78,7 +79,6 @@ public class Enemy : MonoBehaviour
             else return;
         }
 
-        // страховка: если вдруг не нашли комнату в Awake (часто это и даёт “стоячих”)
         if (myRoom == null)
             myRoom = GetComponentInParent<Room>();
 
@@ -88,8 +88,6 @@ public class Enemy : MonoBehaviour
     private void FixedUpdate()
     {
         if (rb == null) return;
-
-        // двигаем физикой
         rb.MovePosition(rb.position + desiredVelocity * Time.fixedDeltaTime);
     }
 
@@ -112,7 +110,6 @@ public class Enemy : MonoBehaviour
         contactDamage = Mathf.RoundToInt(contactDamage * dmgMul);
     }
 
-    // ВАЖНО: задаём комнату снаружи (из EnemySpawner / RoomCombatController)
     public void SetRoom(Room room)
     {
         myRoom = room;
@@ -123,30 +120,28 @@ public class Enemy : MonoBehaviour
         desiredVelocity = Vector2.zero;
         if (player == null) return;
 
-        // Главный фикс "не агриться через комнаты":
-        // если не в текущей комнате игрока — стоим
+        if (IsStunned())
+        {
+            desiredVelocity = Vector2.zero;
+            return;
+        }
+
+        // не агримся через комнаты
         if (CurrentRoomTracker.CurrentRoom != null)
         {
-            // если myRoom не определился, лучше НЕ двигаться вообще (чтобы не бегали через стены)
             if (myRoom == null) return;
-
-            if (CurrentRoomTracker.CurrentRoom != myRoom)
-                return;
+            if (CurrentRoomTracker.CurrentRoom != myRoom) return;
         }
 
         Vector2 toPlayer = (Vector2)(player.position - transform.position);
         float sqrDist = toPlayer.sqrMagnitude;
-
-        if (sqrDist > aggroRange * aggroRange)
-            return;
+        if (sqrDist > aggroRange * aggroRange) return;
 
         Vector2 dir = toPlayer.normalized;
         float dist = Mathf.Sqrt(sqrDist);
 
-        // Проверка препятствия (игнорируем trigger)
         RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, dist, obstacleMask);
-        if (hit.collider != null && !hit.collider.isTrigger)
-            return;
+        if (hit.collider != null && !hit.collider.isTrigger) return;
 
         Vector2 separation = GetSeparationVector();
         Vector2 finalDir = (dir + separation).normalized;
@@ -169,6 +164,13 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    public void Stun(float duration)
+    {
+        stunUntil = Mathf.Max(stunUntil, Time.time + duration);
+    }
+
+    private bool IsStunned() => Time.time < stunUntil;
+
     private Vector3 GetDropPos(Vector3 center)
     {
         Vector2 offset = Random.insideUnitCircle * dropScatterRadius;
@@ -185,17 +187,13 @@ public class Enemy : MonoBehaviour
         if (healPrefab != null && Random.value < healChance)
             Instantiate(healPrefab, GetDropPos(pos), Quaternion.identity);
 
-        if (artifactPickupPrefab != null &&
-            artifactPool != null &&
-            artifactPool.Length > 0 &&
-            Random.value < artifactChance)
+        if (artifactPickupPrefab != null && artifactPool != null && artifactPool.Length > 0 && Random.value < artifactChance)
         {
             var am = GameManager.Instance != null ? GameManager.Instance.GetComponent<ArtifactManager>() : null;
 
             ArtifactData data = PickNonDuplicateArtifact(am);
             if (data == null) return;
 
-            // помечаем при дропе, чтобы на полу тоже не дублировалось
             am?.MarkObtainedThisRun(data);
 
             var obj = Instantiate(artifactPickupPrefab, GetDropPos(pos), Quaternion.identity);
@@ -234,6 +232,8 @@ public class Enemy : MonoBehaviour
 
     private void TryHitPlayer(Collider2D other)
     {
+        if (IsStunned()) return; // ✅ стан блокирует атаки тоже
+
         if (!other.CompareTag("Player")) return;
         if (Time.time - lastAttackTime < attackCooldown) return;
 
