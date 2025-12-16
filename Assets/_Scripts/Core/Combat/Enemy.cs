@@ -8,7 +8,6 @@ public class Enemy : MonoBehaviour
     private Transform player;
 
     private Vector2 desiredVelocity;
-
     private bool isDead = false;
 
     public event System.Action<Enemy> OnEnemyDied;
@@ -23,7 +22,7 @@ public class Enemy : MonoBehaviour
     [Tooltip("Радиус, в котором враг видит игрока")]
     public float aggroRange = 6f;
 
-    [Tooltip("Слои стен/препятствий")]
+    [Tooltip("Слои стен/препятствий (обычно Wall)")]
     public LayerMask obstacleMask;
 
     [Header("Separation")]
@@ -58,10 +57,12 @@ public class Enemy : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
+
+        // IMPORTANT: иногда myRoom может быть null при Awake (зависит от иерархии/спавна)
         myRoom = GetComponentInParent<Room>();
 
         if (obstacleMask.value == 0)
-            obstacleMask = LayerMask.GetMask("Obstacles");
+            obstacleMask = LayerMask.GetMask("Wall");
 
         if (enemyMask.value == 0)
             enemyMask = LayerMask.GetMask("Enemy");
@@ -69,12 +70,17 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
+        // страховка: если Init не успел / игрок не проставился
         if (player == null)
         {
             var p = GameObject.FindGameObjectWithTag("Player");
             if (p != null) player = p.transform;
             else return;
         }
+
+        // страховка: если вдруг не нашли комнату в Awake (часто это и даёт “стоячих”)
+        if (myRoom == null)
+            myRoom = GetComponentInParent<Room>();
 
         ComputeDesiredVelocity();
     }
@@ -106,17 +112,29 @@ public class Enemy : MonoBehaviour
         contactDamage = Mathf.RoundToInt(contactDamage * dmgMul);
     }
 
+    // ВАЖНО: задаём комнату снаружи (из EnemySpawner / RoomCombatController)
+    public void SetRoom(Room room)
+    {
+        myRoom = room;
+    }
+
     private void ComputeDesiredVelocity()
     {
         desiredVelocity = Vector2.zero;
-
         if (player == null) return;
 
-        // игрок не в нашей комнате — стоим
-        if (CurrentRoomTracker.CurrentRoom != null && myRoom != null && CurrentRoomTracker.CurrentRoom != myRoom)
-            return;
+        // Главный фикс "не агриться через комнаты":
+        // если не в текущей комнате игрока — стоим
+        if (CurrentRoomTracker.CurrentRoom != null)
+        {
+            // если myRoom не определился, лучше НЕ двигаться вообще (чтобы не бегали через стены)
+            if (myRoom == null) return;
 
-        Vector2 toPlayer = (player.position - transform.position);
+            if (CurrentRoomTracker.CurrentRoom != myRoom)
+                return;
+        }
+
+        Vector2 toPlayer = (Vector2)(player.position - transform.position);
         float sqrDist = toPlayer.sqrMagnitude;
 
         if (sqrDist > aggroRange * aggroRange)
@@ -157,7 +175,7 @@ public class Enemy : MonoBehaviour
         return center + new Vector3(offset.x, offset.y, 0f);
     }
 
-    void DropLoot()
+    private void DropLoot()
     {
         Vector3 pos = transform.position;
 
@@ -167,13 +185,17 @@ public class Enemy : MonoBehaviour
         if (healPrefab != null && Random.value < healChance)
             Instantiate(healPrefab, GetDropPos(pos), Quaternion.identity);
 
-        if (artifactPickupPrefab != null && artifactPool != null && artifactPool.Length > 0 && Random.value < artifactChance)
+        if (artifactPickupPrefab != null &&
+            artifactPool != null &&
+            artifactPool.Length > 0 &&
+            Random.value < artifactChance)
         {
             var am = GameManager.Instance != null ? GameManager.Instance.GetComponent<ArtifactManager>() : null;
 
             ArtifactData data = PickNonDuplicateArtifact(am);
             if (data == null) return;
 
+            // помечаем при дропе, чтобы на полу тоже не дублировалось
             am?.MarkObtainedThisRun(data);
 
             var obj = Instantiate(artifactPickupPrefab, GetDropPos(pos), Quaternion.identity);
@@ -200,15 +222,13 @@ public class Enemy : MonoBehaviour
         return candidates[Random.Range(0, candidates.Count)];
     }
 
-    void Die()
+    private void Die()
     {
         GameManager.Instance.OnEnemyKilled();
         OnEnemyDied?.Invoke(this);
         Destroy(gameObject);
     }
 
-    // ⚠️ ВАЖНО: чтобы контактный урон работал с Dynamic Rigidbody,
-    // у врага должен быть ОТДЕЛЬНЫЙ Trigger-коллайдер (см. ниже).
     private void OnTriggerEnter2D(Collider2D other) => TryHitPlayer(other);
     private void OnTriggerStay2D(Collider2D other) => TryHitPlayer(other);
 

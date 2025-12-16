@@ -22,6 +22,15 @@ public class ArtifactManager : MonoBehaviour
         OnArtifactsChanged?.Invoke(artifacts);
     }
 
+    public bool HasArtifact(ArtifactEffectType type)
+    {
+        foreach (var a in artifacts)
+            if (a != null && a.effectType == type)
+                return true;
+        return false;
+    }
+
+
     // Вызываем при ДРОПЕ (чтобы не дублировалось на полу)
     public void MarkObtainedThisRun(ArtifactData data)
     {

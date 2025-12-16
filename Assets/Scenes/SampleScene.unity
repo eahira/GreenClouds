@@ -2189,7 +2189,7 @@ MonoBehaviour:
   maxAttemptsPerEnemy: 12
   enemyMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   obstacleMask:
     serializedVersion: 2
     m_Bits: 0
@@ -3368,6 +3368,7 @@ GameObject:
   - component: {fileID: 1905374648}
   - component: {fileID: 1905374650}
   - component: {fileID: 1905374651}
+  - component: {fileID: 1905374652}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -3514,6 +3515,7 @@ MonoBehaviour:
   currentHealth: 0
   clickDamage: 1
   ultimateSystem: {fileID: 0}
+  ghostShieldHpThreshold: 0.3
 --- !u!50 &1905374650
 Rigidbody2D:
   serializedVersion: 5
@@ -3559,6 +3561,19 @@ MonoBehaviour:
   chargeNeeded: 10
   ultimateDamage: 50
   ultimateRadius: 3
+--- !u!114 &1905374652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905374645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24b92f55f03a6804ab42bb1bdaf3e8e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArtifactEffectSystem
+  sparkMaxBonus: 1
 --- !u!1 &1919195455
 GameObject:
   m_ObjectHideFlags: 0

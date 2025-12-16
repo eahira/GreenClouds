@@ -116,7 +116,12 @@ public class RoomCombatController : MonoBehaviour
         if (enemy == null) return;
         enemies.Add(enemy);
         enemy.OnEnemyDied += HandleEnemyDied;
+
+        // ВАЖНО: заставляем врага знать свою комнату
+        if (room != null)
+            enemy.SetRoom(room);
     }
+
 
     void HandleEnemyDied(Enemy enemy)
     {

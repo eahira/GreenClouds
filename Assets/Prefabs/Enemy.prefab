@@ -112,7 +112,7 @@ MonoBehaviour:
   aggroRange: 12
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   separationRadius: 0.8
   separationStrength: 2
   enemyMask:
