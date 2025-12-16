@@ -27,3 +27,6 @@ sysinfo.txt
 *.apk
 *.aab
 *.unitypackage
+
+# Visual Studio
+.vs/

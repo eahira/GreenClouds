@@ -17,6 +17,25 @@ public class PlayerController : MonoBehaviour
     [Header("Ultimate")]
     public UltimateSystem ultimateSystem;
 
+    [Header("Ghost Shield")]
+    [Range(0.05f, 0.95f)]
+    public float ghostShieldHpThreshold = 0.3f;
+    private bool ghostShieldReady = true;
+    private bool ghostShieldActive = false;
+
+    [Header("Blessing Regen (only when idle)")]
+    public float blessingRegenPerSecond = 1.0f;      // рекомендую 0.5..1.0
+    public float blessingIdleSpeedThreshold = 0.08f; // чуть выше, чтобы точно не хилить “в движении”
+    public float blessingStartDelay = 0.25f;
+    private float blessingIdleTimer = 0f;
+    private float blessingRegenAccumulator = 0f;
+
+    private ArtifactManager artifactManager;
+
+    // считаем реальную скорость через дельту позиции (работает даже с MovePosition/kinematic)
+    private Vector2 _prevPos;
+    private float _speedSqr;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -24,6 +43,10 @@ public class PlayerController : MonoBehaviour
 
         if (ultimateSystem == null)
             ultimateSystem = GetComponent<UltimateSystem>();
+
+        artifactManager = GameManager.Instance != null ? GameManager.Instance.GetComponent<ArtifactManager>() : null;
+
+        _prevPos = rb != null ? rb.position : (Vector2)transform.position;
     }
 
     private void Update()
@@ -36,53 +59,143 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        Vector2 curPos = rb != null ? rb.position : (Vector2)transform.position;
+        Vector2 step = movement.normalized * moveSpeed * Time.fixedDeltaTime;
+
         if (rb != null)
-            rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+            rb.MovePosition(curPos + step);
         else
-            transform.position += (Vector3)movement.normalized * moveSpeed * Time.deltaTime;
+            transform.position += (Vector3)step;
+
+        // реальная скорость = deltaPos / dt
+        Vector2 newPos = rb != null ? rb.position : (Vector2)transform.position;
+        Vector2 delta = newPos - _prevPos;
+        _speedSqr = (delta / Time.fixedDeltaTime).sqrMagnitude;
+        _prevPos = newPos;
+
+        UpdateBlessingRegen();
     }
 
-    void CheckForEnemyClick()
+    private void UpdateBlessingRegen()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (artifactManager == null) return;
+        if (!artifactManager.HasArtifact(ArtifactEffectType.Blessing)) return;
+        if (currentHealth <= 0) return;
+
+        float threshSqr = blessingIdleSpeedThreshold * blessingIdleSpeedThreshold;
+        bool isIdle = _speedSqr <= threshSqr;
+
+        if (!isIdle)
         {
-            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-            // ���� ����� "�������" ���� ����� � ����� �������
-            float radius = 0.2f;
-            Collider2D hit = Physics2D.OverlapCircle(mousePos, radius, enemyLayer);
-
-            if (hit != null)
-            {
-                Enemy enemy = hit.GetComponent<Enemy>();
-                if (enemy != null)
-                {
-                    enemy.TakeDamage(clickDamage);
-                    ultimateSystem?.AddCharge(1);
-                }
-            }
+            blessingIdleTimer = 0f;
+            blessingRegenAccumulator = 0f;
+            return;
         }
+
+        blessingIdleTimer += Time.fixedDeltaTime;
+        if (blessingIdleTimer < blessingStartDelay)
+            return;
+
+        blessingRegenAccumulator += blessingRegenPerSecond * Time.fixedDeltaTime;
+
+        int healInt = Mathf.FloorToInt(blessingRegenAccumulator);
+        if (healInt > 0)
+        {
+            Heal(healInt);
+            blessingRegenAccumulator -= healInt;
+        }
+    }
+
+    private void CheckGhostShield()
+    {
+        if (artifactManager == null) return;
+        if (!artifactManager.HasArtifact(ArtifactEffectType.GhostShield)) return;
+
+        float hpPercent = (maxHealth > 0) ? (float)currentHealth / maxHealth : 1f;
+
+        if (hpPercent <= ghostShieldHpThreshold && ghostShieldReady)
+        {
+            ghostShieldActive = true;
+            ghostShieldReady = false;
+            Debug.Log("Ghost Shield activated!");
+        }
+
+        if (hpPercent > ghostShieldHpThreshold)
+            ghostShieldReady = true;
+    }
+
+    private void CheckForEnemyClick()
+    {
+        if (!Input.GetMouseButtonDown(0)) return;
+
+        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        float radius = 0.2f;
+        Collider2D hit = Physics2D.OverlapCircle(mousePos, radius, enemyLayer);
+
+        if (hit == null) return;
+
+        Enemy enemy = hit.GetComponent<Enemy>();
+        if (enemy == null) return;
+
+        int dmg = clickDamage;
+
+        var effects = GetComponent<ArtifactEffectSystem>();
+        if (effects != null)
+            dmg = effects.ModifyClickDamage(clickDamage);
+
+        enemy.TakeDamage(dmg);
+        ultimateSystem?.AddCharge(1);
     }
 
     public void TakeDamage(int damage)
     {
+        // GhostShield блокирует один удар
+        if (ghostShieldActive)
+        {
+            ghostShieldActive = false;
+
+            FloatingDamageText.Spawn(transform.position + Vector3.up * 1.0f, 0);
+            PlayerEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
+
+            Debug.Log("Ghost Shield absorbed damage!");
+            return;
+        }
+
         currentHealth -= damage;
-    
+
         PlayerEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
-    
-        // Показать урон над игроком
         FloatingDamageText.Spawn(transform.position + Vector3.up * 1.0f, damage);
-    
+
         if (currentHealth <= 0)
+        {
             Die();
+            return;
+        }
+
+        // ShadowCloud: срабатывает при получении урона
+        var cloud = GetComponent<ShadowCloudEffect>();
+        if (cloud != null)
+            cloud.OnPlayerDamaged();
+
+        CheckGhostShield();
     }
 
+    public void Heal(int amount)
+    {
+        if (amount <= 0) return;
 
+        int before = currentHealth;
+        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
 
-    void Die()
+        if (currentHealth != before)
+            PlayerEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
+
+        CheckGhostShield();
+    }
+
+    private void Die()
     {
         GameManager.Instance.PlayerDied();
         gameObject.SetActive(false);
     }
 }
-

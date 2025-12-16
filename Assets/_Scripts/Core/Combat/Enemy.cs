@@ -1,7 +1,15 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Enemy : MonoBehaviour
 {
+    private Rigidbody2D rb;
+    private Room myRoom;
+    private Transform player;
+
+    private Vector2 desiredVelocity;
+    private bool isDead = false;
+
     public event System.Action<Enemy> OnEnemyDied;
 
     [Header("Stats")]
@@ -10,42 +18,79 @@ public class Enemy : MonoBehaviour
 
     [Header("Movement")]
     public float moveSpeed = 2f;
-    private Transform player;
 
-    [Tooltip("Радиус, в котором враг вообще видит игрока")]
-    public float aggroRange = 12f;
+    [Tooltip("Радиус, в котором враг видит игрока")]
+    public float aggroRange = 6f;
 
-    [Tooltip("Слои, которые считаются стенами/препятствиями")]
-    public LayerMask obstacleMask;   // сюда поставим слой Obstacles
+    [Tooltip("Слои стен/препятствий (обычно Wall)")]
+    public LayerMask obstacleMask;
+
+    [Header("Separation")]
+    public float separationRadius = 0.8f;
+    public float separationStrength = 2.0f;
+    public LayerMask enemyMask;
 
     [Header("Damage")]
-	public int contactDamage = 10;
+    public int contactDamage = 10;
 
-	[Header("Attack")]
-	public float attackCooldown = 0.7f;   // время между ударами по игроку, в секундах
-	private float lastAttackTime = -999f; // когда в последний раз били игрока
+    [Header("Attack")]
+    public float attackCooldown = 0.7f;
+    private float lastAttackTime = -999f;
 
+    [Header("Loot Prefabs")]
+    public GameObject coinPrefab;
+    public GameObject healPrefab;
+    public GameObject artifactPickupPrefab;
 
-    [Header("Loot")]
-    public GameObject lootPrefab;
+    [Header("Drop Chances")]
+    [Range(0f, 1f)] public float coinChance = 1.0f;
+    [Range(0f, 1f)] public float healChance = 0.12f;
+    [Range(0f, 1f)] public float artifactChance = 0.08f;
+
+    [Header("Artifact Pool")]
+    public ArtifactData[] artifactPool;
+
+    [Header("Drop Scatter")]
+    public float dropScatterRadius = 0.6f;
+
+    // stun
+    private float stunUntil = -1f;
 
     private void Awake()
     {
+        rb = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
 
-        // если не настроишь в инспекторе — подстрахуемся
+        myRoom = GetComponentInParent<Room>();
+
         if (obstacleMask.value == 0)
-            obstacleMask = LayerMask.GetMask("Obstacles");
+            obstacleMask = LayerMask.GetMask("Wall");
+
+        if (enemyMask.value == 0)
+            enemyMask = LayerMask.GetMask("Enemy");
     }
 
     private void Update()
     {
-        MoveTowardsPlayer();
+        if (player == null)
+        {
+            var p = GameObject.FindGameObjectWithTag("Player");
+            if (p != null) player = p.transform;
+            else return;
+        }
+
+        if (myRoom == null)
+            myRoom = GetComponentInParent<Room>();
+
+        ComputeDesiredVelocity();
     }
 
-    /// <summary>
-    /// Вызывается спавнером, чтобы передать ссылку на игрока
-    /// </summary>
+    private void FixedUpdate()
+    {
+        if (rb == null) return;
+        rb.MovePosition(rb.position + desiredVelocity * Time.fixedDeltaTime);
+    }
+
     public void Init(Transform playerTransform)
     {
         player = playerTransform;
@@ -55,7 +100,7 @@ public class Enemy : MonoBehaviour
 
         if (GameManager.Instance != null)
         {
-            hpMul  = GameManager.Instance.GetEnemyHealthMultiplier();
+            hpMul = GameManager.Instance.GetEnemyHealthMultiplier();
             dmgMul = GameManager.Instance.GetEnemyDamageMultiplier();
         }
 
@@ -65,86 +110,164 @@ public class Enemy : MonoBehaviour
         contactDamage = Mathf.RoundToInt(contactDamage * dmgMul);
     }
 
-
-    private void MoveTowardsPlayer()
+    public void SetRoom(Room room)
     {
+        myRoom = room;
+    }
+
+    private void ComputeDesiredVelocity()
+    {
+        desiredVelocity = Vector2.zero;
         if (player == null) return;
 
-        Vector2 toPlayer = (player.position - transform.position);
-        float sqrDist = toPlayer.sqrMagnitude;
-
-        // 1) слишком далеко — даже не пытаемся агриться
-        if (sqrDist > aggroRange * aggroRange)
+        if (IsStunned())
+        {
+            desiredVelocity = Vector2.zero;
             return;
+        }
 
-        // 2) проверка на стену между врагом и игроком
+        // не агримся через комнаты
+        if (CurrentRoomTracker.CurrentRoom != null)
+        {
+            if (myRoom == null) return;
+            if (CurrentRoomTracker.CurrentRoom != myRoom) return;
+        }
+
+        Vector2 toPlayer = (Vector2)(player.position - transform.position);
+        float sqrDist = toPlayer.sqrMagnitude;
+        if (sqrDist > aggroRange * aggroRange) return;
+
         Vector2 dir = toPlayer.normalized;
         float dist = Mathf.Sqrt(sqrDist);
 
         RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, dist, obstacleMask);
-        // Если луч упёрся во что-то на слое Obstacles ДО игрока — видимость заблокирована
-        if (hit.collider != null)
-        {
-            // есть препятствие, не двигаемся
-            return;
-        }
+        if (hit.collider != null && !hit.collider.isTrigger) return;
 
-        // 3) путь свободен — двигаемся к игроку
-        transform.position += (Vector3)dir * moveSpeed * Time.deltaTime;
+        Vector2 separation = GetSeparationVector();
+        Vector2 finalDir = (dir + separation).normalized;
+
+        desiredVelocity = finalDir * moveSpeed;
     }
 
     public void TakeDamage(int damage)
     {
-        currentHealth -= damage;
+        if (isDead) return;
 
+        currentHealth -= damage;
         EnemyEvents.OnEnemyHealthChanged?.Invoke(currentHealth, maxHealth);
 
-        if (currentHealth <= 0)
+        if (currentHealth <= 0 && !isDead)
         {
+            isDead = true;
             DropLoot();
             Die();
         }
     }
 
-    void DropLoot()
+    public void Stun(float duration)
     {
-        if (lootPrefab != null)
+        stunUntil = Mathf.Max(stunUntil, Time.time + duration);
+    }
+
+    private bool IsStunned() => Time.time < stunUntil;
+
+    private Vector3 GetDropPos(Vector3 center)
+    {
+        Vector2 offset = Random.insideUnitCircle * dropScatterRadius;
+        return center + new Vector3(offset.x, offset.y, 0f);
+    }
+
+    private void DropLoot()
+    {
+        Vector3 pos = transform.position;
+
+        if (coinPrefab != null && Random.value < coinChance)
+            Instantiate(coinPrefab, GetDropPos(pos), Quaternion.identity);
+
+        if (healPrefab != null && Random.value < healChance)
+            Instantiate(healPrefab, GetDropPos(pos), Quaternion.identity);
+
+        if (artifactPickupPrefab != null && artifactPool != null && artifactPool.Length > 0 && Random.value < artifactChance)
         {
-            Instantiate(lootPrefab, transform.position, Quaternion.identity);
+            var am = GameManager.Instance != null ? GameManager.Instance.GetComponent<ArtifactManager>() : null;
+
+            ArtifactData data = PickNonDuplicateArtifact(am);
+            if (data == null) return;
+
+            am?.MarkObtainedThisRun(data);
+
+            var obj = Instantiate(artifactPickupPrefab, GetDropPos(pos), Quaternion.identity);
+            var pickup = obj.GetComponent<ArtifactPickup>();
+            if (pickup != null) pickup.data = data;
         }
     }
 
-    void Die()
+    private ArtifactData PickNonDuplicateArtifact(ArtifactManager am)
+    {
+        if (am == null)
+            return artifactPool[Random.Range(0, artifactPool.Length)];
+
+        List<ArtifactData> candidates = new List<ArtifactData>();
+
+        foreach (var a in artifactPool)
+        {
+            if (a == null) continue;
+            if (am.WasObtainedThisRun(a)) continue;
+            candidates.Add(a);
+        }
+
+        if (candidates.Count == 0) return null;
+        return candidates[Random.Range(0, candidates.Count)];
+    }
+
+    private void Die()
     {
         GameManager.Instance.OnEnemyKilled();
         OnEnemyDied?.Invoke(this);
         Destroy(gameObject);
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-	{
-    	TryHitPlayer(other);
-	}
+    private void OnTriggerEnter2D(Collider2D other) => TryHitPlayer(other);
+    private void OnTriggerStay2D(Collider2D other) => TryHitPlayer(other);
 
-	private void OnTriggerStay2D(Collider2D other)
-	{
-	    // пока враг "трётся" об игрока — он тоже может бить, но не чаще, чем раз в attackCooldown
-    	TryHitPlayer(other);
-	}
+    private void TryHitPlayer(Collider2D other)
+    {
+        if (IsStunned()) return; // ✅ стан блокирует атаки тоже
 
-	private void TryHitPlayer(Collider2D other)
-	{
-    	if (!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player")) return;
+        if (Time.time - lastAttackTime < attackCooldown) return;
 
-    	// проверяем кд
-    	if (Time.time - lastAttackTime < attackCooldown)
-        	return;
+        PlayerController pc = other.GetComponent<PlayerController>();
+        if (pc == null) return;
 
-    	PlayerController player = other.GetComponent<PlayerController>();
-    	if (player == null) return;
+        lastAttackTime = Time.time;
+        pc.TakeDamage(contactDamage);
+    }
 
-    	lastAttackTime = Time.time;
-    	player.TakeDamage(contactDamage);
-	}
+    private Vector2 GetSeparationVector()
+    {
+        Collider2D[] cols = Physics2D.OverlapCircleAll(transform.position, separationRadius, enemyMask);
 
+        Vector2 push = Vector2.zero;
+        int count = 0;
+
+        foreach (var c in cols)
+        {
+            if (c == null) continue;
+            if (c.gameObject == gameObject) continue;
+
+            Vector2 away = (Vector2)(transform.position - c.transform.position);
+            float dist = away.magnitude;
+            if (dist <= 0.0001f) continue;
+
+            float t = 1f - Mathf.Clamp01(dist / separationRadius);
+            push += away.normalized * t;
+            count++;
+        }
+
+        if (count == 0) return Vector2.zero;
+
+        push /= count;
+        return push.normalized * (separationStrength * 0.35f);
+    }
 }

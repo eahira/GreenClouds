@@ -92,7 +92,7 @@ public class RoomCombatController : MonoBehaviour
         }
 
         Vector3 pos = enemySpawner != null ? enemySpawner.transform.position : transform.position;
-        GameObject bossObj = Object.Instantiate(bossPrefab, pos, Quaternion.identity);
+        GameObject bossObj = Object.Instantiate(bossPrefab, pos, Quaternion.identity, transform);
 
         Enemy bossEnemy = bossObj.GetComponent<Enemy>();
         if (bossEnemy != null)
@@ -116,7 +116,12 @@ public class RoomCombatController : MonoBehaviour
         if (enemy == null) return;
         enemies.Add(enemy);
         enemy.OnEnemyDied += HandleEnemyDied;
+
+        // ВАЖНО: заставляем врага знать свою комнату
+        if (room != null)
+            enemy.SetRoom(room);
     }
+
 
     void HandleEnemyDied(Enemy enemy)
     {

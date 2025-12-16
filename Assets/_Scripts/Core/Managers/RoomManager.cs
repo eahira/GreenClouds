@@ -278,6 +278,9 @@ public class RoomManager : MonoBehaviour
 
         Vector2Int startIndex = startRoom.RoomIndex;
 
+        if (RoomCameraController.Instance != null)
+            RoomCameraController.Instance.SetRoom(startRoom);
+
         // ищем самую дальнюю комнату от стартовой по манхэттенскому расстоянию
         GameObject bossRoomObj = null;
         int maxDistance = -1;
