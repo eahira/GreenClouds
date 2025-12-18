@@ -450,7 +450,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.34922743, g: 0.5396226, b: 0.48832387, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3626,6 +3626,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ca75c3a788765f4b93857ee5dae9af2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InGameUI
+  avatarImage: {fileID: 128167678}
+  avatarSprites:
+  - {fileID: -179909152, guid: 35f44810ed6d751419b7259e19d43e42, type: 3}
+  - {fileID: -1804934426, guid: cf79eb4e8f0e23b4482e3be64a0f5e6b, type: 3}
+  - {fileID: -1913140185, guid: e19c151a52b3dd648a58a552b540e7a6, type: 3}
   healthFill: {fileID: 939673096}
   healthText: {fileID: 158087763}
   ultimateFill: {fileID: 1582162522}

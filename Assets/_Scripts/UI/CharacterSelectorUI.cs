@@ -8,7 +8,6 @@ public class CharacterSelectorUI : MonoBehaviour
     [Header("UI References")]
     [SerializeField] private Image bigPortrait;
 
-    // ВАЖНО: thumbnails[0]=левый (prev), thumbnails[1]=центр (current), thumbnails[2]=правый (next)
     [SerializeField] private Image[] thumbnails;
 
     [SerializeField] private TextMeshProUGUI descriptionText;
@@ -28,12 +27,12 @@ public class CharacterSelectorUI : MonoBehaviour
 
     private int currentIndex = 0;
 
-    private readonly string[] characterNames = { "Выживший", "Робот", "Ангел" };
+    private readonly string[] characterNames = { "Выживший", "Робот", "Серафим" };
     private readonly string[] characterDescriptions =
     {
-        "Балансный персонаж. Среднее здоровье и урон.",
-        "Высокая защита, низкий урон, особые способности.",
-        "Высокий урон, меньшее здоровье, навыки контроля."
+        "Потерявший всю семью мужчина ищет спасение в загадочной лаборатории.",
+        "У него есть душа и он отправился на поиски своего создателя.",
+        "Он стал добрым и перешел на сторону людей."
     };
 
     private void Start()
@@ -102,7 +101,7 @@ public class CharacterSelectorUI : MonoBehaviour
                     if (type == CharacterType.Robot)
                         descriptionText.text = $"Робот заблокирован.\nКупите в магазине за {gm.robotPrice} монет.";
                     else if (type == CharacterType.Angel)
-                        descriptionText.text = $"Ангел заблокирован.\nКупите в магазине за {gm.angelPrice} монет.";
+                        descriptionText.text = $"Серафим заблокирован.\nКупите в магазине за {gm.angelPrice} монет.";
                     else
                         descriptionText.text = "Персонаж заблокирован.";
                 }
