@@ -1,8 +1,35 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Collider2D))]
 public class ArtifactPickup : MonoBehaviour
 {
+    [Header("Data")]
     public ArtifactData data;
+
+    [Header("Visual")]
+    [SerializeField] private SpriteRenderer iconRenderer;
+
+    private void Awake()
+    {
+        if (iconRenderer == null)
+            iconRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        ApplyVisual();
+    }
+
+    public void Init(ArtifactData newData)
+    {
+        data = newData;
+        ApplyVisual();
+    }
+
+    private void ApplyVisual()
+    {
+        if (iconRenderer == null) return;
+
+        if (data != null && data.icon != null)
+            iconRenderer.sprite = data.icon;
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -14,5 +41,4 @@ public class ArtifactPickup : MonoBehaviour
         am.Pickup(data);
         Destroy(gameObject);
     }
-
 }

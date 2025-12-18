@@ -74,7 +74,6 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        // Страховка: чтобы ArtifactManager точно существовал на GameManager
         if (GetComponent<ArtifactManager>() == null)
             gameObject.AddComponent<ArtifactManager>();
     }
@@ -170,32 +169,27 @@ public class GameManager : MonoBehaviour
         Debug.Log("Enemy killed");
     }
 
-    // Умер = конец забега => сбрасываем артефакты и стадию
     public void PlayerDied()
     {
         Debug.Log("Player died");
 
-        GetComponent<ArtifactManager>()?.ResetRun(); // <-- ВАЖНО
+        GetComponent<ArtifactManager>()?.ResetRun();
 
         ResetCurrentStage();
         SceneManager.LoadScene("DefeatScene");
     }
-
-    // Босс убит => показываем окно (LevelCompleteScene) после 1/2 босса,
-    // после 3 босса => финал и сброс забега
+    
     public void LevelCompleted()
     {
         Debug.Log($"Level {CurrentStage} completed");
 
         if (CurrentStage < MaxStage)
         {
-            // 1 или 2 босс: забег продолжается, артефакты НЕ сбрасываем
             SceneManager.LoadScene("LevelCompleteScene");
         }
         else
         {
-            // 3 босс: конец забега => сбрасываем артефакты
-            GetComponent<ArtifactManager>()?.ResetRun(); // <-- ВАЖНО
+            GetComponent<ArtifactManager>()?.ResetRun();
 
             ResetCurrentStage();
             SceneManager.LoadScene("FinalWinScene");
