@@ -13,6 +13,8 @@ public class ArtifactManager : MonoBehaviour
 
     public event Action<IReadOnlyList<ArtifactData>> OnArtifactsChanged;
 
+    public event Action<ArtifactData> OnArtifactPicked;
+
     public void ResetRun()
     {
         artifacts.Clear();
@@ -60,5 +62,6 @@ public class ArtifactManager : MonoBehaviour
 #endif
 
         OnArtifactsChanged?.Invoke(artifacts);
+        OnArtifactPicked?.Invoke(data);
     }
 }

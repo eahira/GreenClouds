@@ -198,7 +198,7 @@ public class Enemy : MonoBehaviour
 
             var obj = Instantiate(artifactPickupPrefab, GetDropPos(pos), Quaternion.identity);
             var pickup = obj.GetComponent<ArtifactPickup>();
-            if (pickup != null) pickup.data = data;
+            if (pickup != null) pickup.Init(data);
         }
     }
 

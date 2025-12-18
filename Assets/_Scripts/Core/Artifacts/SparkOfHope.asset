@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: SparkOfHope
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactData
   title: "\u0418\u0441\u043A\u0440\u0430 \u043D\u0430\u0434\u0435\u0436\u0434\u044B"
-  description: "\u043B\u044F\u043B\u044F\u043B\u044F"
-  icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  description: "\u0427\u0435\u043C \u043D\u0438\u0436\u0435 \u0432\u0430\u0448\u0435
+    \u0437\u0434\u043E\u0440\u043E\u0432\u044C\u0435, \u0442\u0435\u043C \u0432\u044B\u0448\u0435
+    \u0432\u0430\u0448 \u0443\u0440\u043E\u043D."
+  icon: {fileID: 451969800, guid: a9c44468ed803894a92689495f751e2d, type: 3}
   effectType: 1

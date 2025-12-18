@@ -7,14 +7,27 @@ public class CharacterSelectorUI : MonoBehaviour
 {
     [Header("UI References")]
     [SerializeField] private Image bigPortrait;
+
+    // ВАЖНО: thumbnails[0]=левый (prev), thumbnails[1]=центр (current), thumbnails[2]=правый (next)
     [SerializeField] private Image[] thumbnails;
+
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private Button acceptButton;
 
+    [Header("Sprites")]
+    [Tooltip("Большие портреты по порядку: Survivor, Robot, Angel")]
+    [SerializeField] private Sprite[] bigPortraitSprites;
+
+    [Tooltip("Мини-иконки по порядку: Survivor, Robot, Angel")]
+    [SerializeField] private Sprite[] thumbnailSprites;
+
+    [Header("Locked Visual (optional)")]
+    [SerializeField] private Color lockedTint = new Color(0.5f, 0.5f, 0.5f, 1f);
+    [SerializeField] private Color unlockedTint = Color.white;
+
     private int currentIndex = 0;
 
-    // Имена и описания только для UI
     private readonly string[] characterNames = { "Выживший", "Робот", "Ангел" };
     private readonly string[] characterDescriptions =
     {
@@ -25,77 +38,56 @@ public class CharacterSelectorUI : MonoBehaviour
 
     private void Start()
     {
-        // Подтягиваем выбранного персонажа из GameManager
         if (GameManager.Instance != null)
         {
             switch (GameManager.Instance.selectedCharacter)
             {
-                case CharacterType.Survivor:
-                    currentIndex = 0;
-                    break;
-                case CharacterType.Robot:
-                    currentIndex = 1;
-                    break;
-                case CharacterType.Angel:
-                    currentIndex = 2;
-                    break;
+                case CharacterType.Survivor: currentIndex = 0; break;
+                case CharacterType.Robot:    currentIndex = 1; break;
+                case CharacterType.Angel:    currentIndex = 2; break;
             }
         }
 
         UpdateCharacterUI();
     }
 
-    // Кнопка "Предыдущий персонаж"
     public void OnPrevCharacter()
     {
-        currentIndex--;
-        if (currentIndex < 0) currentIndex = characterNames.Length - 1;
+        currentIndex = WrapIndex(currentIndex - 1);
         UpdateCharacterUI();
     }
 
-    // Кнопка "Следующий персонаж"
     public void OnNextCharacter()
     {
-        currentIndex++;
-        if (currentIndex >= characterNames.Length) currentIndex = 0;
+        currentIndex = WrapIndex(currentIndex + 1);
         UpdateCharacterUI();
     }
 
-    // Кнопка "Назад" — возвращаем в главное меню
     public void OnBackPressed()
     {
         SceneManager.LoadScene("MainMenuScene");
     }
 
-    // Кнопка "Принять" — сохраняем выбор и идём на выбор сложности
     public void OnAcceptPressed()
-	{
- 	   var gm = GameManager.Instance;
- 	   if (gm != null)
-  	  {
-    	    // запоминаем выбранного персонажа
- 	       gm.SelectCharacter((CharacterType)currentIndex);
+    {
+        var gm = GameManager.Instance;
+        if (gm != null)
+        {
+            gm.SelectCharacter(GetCharacterTypeByIndex(currentIndex));
+            gm.ResetCurrentStage();
+        }
 
- 	       // начинаем НОВЫЙ забег для этого героя с 1 уровня
-     	   gm.ResetCurrentStage();
- 	   }
+        SceneManager.LoadScene("DifficultySelectorScene");
+    }
 
-	    // после выбора перса -> экран выбора сложности
-	    SceneManager.LoadScene("DifficultySelectorScene");
-	}
-
-
-    // Обновление интерфейса с информацией о персонаже
     private void UpdateCharacterUI()
     {
-        CharacterType type = GetCharacterTypeByIndex(currentIndex);
+        var type = GetCharacterTypeByIndex(currentIndex);
         bool isLocked = IsCharacterLocked(type);
 
-        // Имя
         if (nameText != null)
             nameText.text = characterNames[currentIndex];
 
-        // Описание
         if (descriptionText != null)
         {
             if (!isLocked)
@@ -104,13 +96,15 @@ public class CharacterSelectorUI : MonoBehaviour
             }
             else
             {
-                // Текст для заблокированных
-                if (GameManager.Instance != null)
+                var gm = GameManager.Instance;
+                if (gm != null)
                 {
                     if (type == CharacterType.Robot)
-                        descriptionText.text = $"Робот заблокирован.\nКупите в магазине за {GameManager.Instance.robotPrice} монет.";
+                        descriptionText.text = $"Робот заблокирован.\nКупите в магазине за {gm.robotPrice} монет.";
                     else if (type == CharacterType.Angel)
-                        descriptionText.text = $"Ангел заблокирован.\nКупите в магазине за {GameManager.Instance.angelPrice} монет.";
+                        descriptionText.text = $"Ангел заблокирован.\nКупите в магазине за {gm.angelPrice} монет.";
+                    else
+                        descriptionText.text = "Персонаж заблокирован.";
                 }
                 else
                 {
@@ -119,24 +113,56 @@ public class CharacterSelectorUI : MonoBehaviour
             }
         }
 
-        // Подсветка мини-аватарки для выбранного персонажа
-        for (int i = 0; i < thumbnails.Length; i++)
+        if (bigPortrait != null && bigPortraitSprites != null && bigPortraitSprites.Length >= characterNames.Length)
         {
-            if (thumbnails[i] == null) continue;
+            bigPortrait.sprite = bigPortraitSprites[currentIndex];
+            bigPortrait.preserveAspect = true;
 
-            // выбранная — белая, остальные притемнённые
-            thumbnails[i].color = (i == currentIndex)
-                ? Color.white
-                : new Color(0.7f, 0.7f, 0.7f);
+            bigPortrait.color = isLocked ? lockedTint : unlockedTint;
         }
 
-        // Если герой заблокирован — нельзя нажать "Принять"
+        RefreshThumbnailsCarousel();
+
         if (acceptButton != null)
             acceptButton.interactable = !isLocked;
-
     }
 
-    // Маппинг индекс -> тип персонажа
+    private void RefreshThumbnailsCarousel()
+    {
+        if (thumbnails == null || thumbnails.Length < 3) return;
+        if (thumbnailSprites == null || thumbnailSprites.Length < characterNames.Length) return;
+
+        int prev = WrapIndex(currentIndex - 1);
+        int cur  = WrapIndex(currentIndex);
+        int next = WrapIndex(currentIndex + 1);
+
+        SetThumb(0, prev,  highlight: false);
+        SetThumb(1, cur,   highlight: true);
+        SetThumb(2, next,  highlight: false);
+    }
+
+    private void SetThumb(int thumbSlot, int characterIndex, bool highlight)
+    {
+        var img = thumbnails[thumbSlot];
+        if (img == null) return;
+
+        img.sprite = thumbnailSprites[characterIndex];
+        img.preserveAspect = true;
+
+        img.color = highlight ? Color.white : new Color(0.7f, 0.7f, 0.7f, 1f);
+
+        var type = GetCharacterTypeByIndex(characterIndex);
+        bool locked = IsCharacterLocked(type);
+        if (locked)
+            img.color = new Color(img.color.r * lockedTint.r, img.color.g * lockedTint.g, img.color.b * lockedTint.b, 1f);
+    }
+
+    private int WrapIndex(int i)
+    {
+        int n = characterNames.Length;
+        return (i % n + n) % n;
+    }
+
     private CharacterType GetCharacterTypeByIndex(int index)
     {
         switch (index)
@@ -148,11 +174,10 @@ public class CharacterSelectorUI : MonoBehaviour
         }
     }
 
-    // Проверка, заблокирован ли герой
     private bool IsCharacterLocked(CharacterType type)
     {
         if (GameManager.Instance == null)
-            return false; // оффлайн-режим: никого не блокируем
+            return false;
 
         switch (type)
         {
@@ -161,7 +186,7 @@ public class CharacterSelectorUI : MonoBehaviour
             case CharacterType.Angel:
                 return !GameManager.Instance.angelUnlocked;
             default:
-                return false; // Выживший всегда доступен
+                return false;
         }
     }
 }
