@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3f699922c6ba414f9c2d320a4afc24e, type: 3}
+  m_Name: Theme_Stage2_Orange
+  m_EditorClassIdentifier: Assembly-CSharp::LevelThemeData
+  roomBackgrounds:
+  - {fileID: 5983185425250948699, guid: 533d490cac3db124e9d311b306850a56, type: 3}
+  - {fileID: 6579083030054829874, guid: 53c12f4a9ab429f429eeec6499bab269, type: 3}
+  - {fileID: 5651696149531901307, guid: 97b242bab06e1eb4da5a672360fbd5b8, type: 3}
+  - {fileID: -7889279674416052240, guid: b94127ef68a00db499ffc5a6de5c9adf, type: 3}
+  - {fileID: 8722510718243965630, guid: 84c627a306c8f2c4bb80dcf5bc3061c5, type: 3}
+  - {fileID: -8497870287210593534, guid: 043205323d510774d9baa9ecd0cecd01, type: 3}
+  - {fileID: 7755910811396200915, guid: 411fb628e0aec1f4c86fe06ba3b0c295, type: 3}
+  - {fileID: 1739198340571973104, guid: 377b6cd5f8e6cff489accd29ee606a52, type: 3}
+  doorBlockerSprite: {fileID: -42653222, guid: 1568a5dbe161c334292decea2a3417d7, type: 3}

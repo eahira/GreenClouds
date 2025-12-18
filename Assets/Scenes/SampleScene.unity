@@ -3939,8 +3939,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -85561513
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.16537353, g: 0.5622641, b: 0.15170519, a: 1}
@@ -4292,7 +4292,12 @@ MonoBehaviour:
   minRooms: 11
   gridSizeX: 15
   gridSizeY: 15
+  roomWidth: 20
+  roomHeight: 12
   player: {fileID: 0}
+  stage1Theme: {fileID: 11400000, guid: b1e6b793600482147bf3cc053766c1e9, type: 2}
+  stage2Theme: {fileID: 11400000, guid: ac5ba21aa4f0e964ca4754bc766e97f7, type: 2}
+  stage3Theme: {fileID: 11400000, guid: 4fe6fdb2b2abe8f46b33c3393dbc1cf7, type: 2}
 --- !u!4 &2007870276
 Transform:
   m_ObjectHideFlags: 0

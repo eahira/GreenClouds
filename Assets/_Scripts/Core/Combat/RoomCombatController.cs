@@ -34,13 +34,19 @@ public class RoomCombatController : MonoBehaviour
         if (enemySpawner != null)
             enemySpawner.player = playerTransform;
 
+        // ✅ По твоему ТЗ: пока НЕ зачищено — порталы и блокеры ВЫКЛ
         if (room != null)
-            room.SetPortalsActive(false);
+            room.SetCleared(false);
 
-        if (isBossRoom)
-            SpawnBoss();
-        else
-            SpawnRegularEnemies();
+        if (isBossRoom) SpawnBoss();
+        else SpawnRegularEnemies();
+
+        // Если вдруг никого не заспавнилось — считаем комнату зачищенной сразу
+        if (enemies.Count == 0 && room != null)
+        {
+            IsCleared = true;
+            room.SetCleared(true);
+        }
     }
 
     void SpawnRegularEnemies()
@@ -50,28 +56,19 @@ public class RoomCombatController : MonoBehaviour
         int min = Mathf.Max(1, baseMinEnemies);
         int max = Mathf.Max(min, baseMaxEnemies);
 
-        // базовый множитель количества врагов
         float countMul = 1f;
 
         if (GameManager.Instance != null)
         {
-            // 1) множитель от сложности (Easy/Medium/Hard)
             countMul *= GameManager.Instance.GetEnemyCountMultiplier();
 
-            // 2) множитель от ЭТАПА героя (1 / 2 / 3)
             switch (GameManager.Instance.CurrentStage)
             {
-                case 2:
-                    countMul *= 1.3f; // на 2-м уровне чуть больше врагов
-                    break;
-                case 3:
-                    countMul *= 1.6f; // на 3-м ещё больше
-                    break;
-                // case 1: ничего не умножаем
+                case 2: countMul *= 1.3f; break;
+                case 3: countMul *= 1.6f; break;
             }
         }
 
-        // применяем множитель к мин/макс количеству
         min = Mathf.Max(1, Mathf.RoundToInt(min * countMul));
         max = Mathf.Max(min, Mathf.RoundToInt(max * countMul));
 
@@ -80,8 +77,6 @@ public class RoomCombatController : MonoBehaviour
         var spawned = enemySpawner.SpawnEnemies(count);
         RegisterEnemies(spawned);
     }
-
-
 
     void SpawnBoss()
     {
@@ -92,7 +87,7 @@ public class RoomCombatController : MonoBehaviour
         }
 
         Vector3 pos = enemySpawner != null ? enemySpawner.transform.position : transform.position;
-        GameObject bossObj = Object.Instantiate(bossPrefab, pos, Quaternion.identity, transform);
+        GameObject bossObj = Instantiate(bossPrefab, pos, Quaternion.identity, transform);
 
         Enemy bossEnemy = bossObj.GetComponent<Enemy>();
         if (bossEnemy != null)
@@ -107,21 +102,19 @@ public class RoomCombatController : MonoBehaviour
     void RegisterEnemies(List<Enemy> list)
     {
         if (list == null) return;
-        foreach (var e in list)
-            RegisterEnemy(e);
+        foreach (var e in list) RegisterEnemy(e);
     }
 
     void RegisterEnemy(Enemy enemy)
     {
         if (enemy == null) return;
+
         enemies.Add(enemy);
         enemy.OnEnemyDied += HandleEnemyDied;
 
-        // ВАЖНО: заставляем врага знать свою комнату
         if (room != null)
             enemy.SetRoom(room);
     }
-
 
     void HandleEnemyDied(Enemy enemy)
     {
@@ -135,8 +128,9 @@ public class RoomCombatController : MonoBehaviour
         IsCleared = true;
         Debug.Log($"Комната {name} зачищена");
 
+        // ✅ По твоему ТЗ: после зачистки — порталы и блокеры ВКЛ
         if (room != null)
-            room.SetPortalsActive(true);
+            room.SetCleared(true);
 
         if (isBossRoom && GameManager.Instance != null)
         {
@@ -148,9 +142,6 @@ public class RoomCombatController : MonoBehaviour
     private void OnDestroy()
     {
         foreach (var e in enemies)
-        {
-            if (e != null)
-                e.OnEnemyDied -= HandleEnemyDied;
-        }
+            if (e != null) e.OnEnemyDied -= HandleEnemyDied;
     }
 }
