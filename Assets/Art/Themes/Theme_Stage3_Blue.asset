@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3f699922c6ba414f9c2d320a4afc24e, type: 3}
+  m_Name: Theme_Stage3_Blue
+  m_EditorClassIdentifier: Assembly-CSharp::LevelThemeData
+  roomBackgrounds:
+  - {fileID: 8898640648063212457, guid: f587e2b17a9f11f4394d11c3bfecb1a2, type: 3}
+  - {fileID: -6821244563470506619, guid: 1b50d4888db07e645b7fb5b73f36c7f7, type: 3}
+  - {fileID: -4847371585928388495, guid: 2d7d430c5ad7f5547be3bf43fdaad250, type: 3}
+  - {fileID: 325033534691886490, guid: 151213519eeefac47a03177e52b795c2, type: 3}
+  - {fileID: 2484847194672993469, guid: 42d838600b240924996256d724ffeaa0, type: 3}
+  - {fileID: -44240675177737815, guid: 151b3a3e65ab0f34096b6b48d269b4e1, type: 3}
+  - {fileID: -7387479518256028124, guid: 74cbad9a10e949243a5b58f20435501c, type: 3}
+  - {fileID: -2870890809771460229, guid: 0a0d3a4172ada134aa291b95c9c16abd, type: 3}
+  - {fileID: 8163826536963902843, guid: e86604254323d474aab9fe0993b67fe3, type: 3}
+  - {fileID: 1002948394816411394, guid: 56b5507120b1d384fb9d0498963345f0, type: 3}
+  - {fileID: 4505402424878880668, guid: 02a3f6f38749b034d9c79a2303c75811, type: 3}
+  - {fileID: -3278539092964822050, guid: ad15ac31c2ea68e4ba0a7ba4daad627f, type: 3}
+  - {fileID: 331517154895451867, guid: 83bb112b4a6b20e4b92f7e0b56784835, type: 3}
+  doorBlockerSprite: {fileID: -294415980, guid: 87e2407cbe345f94ebc340a306b22ab3, type: 3}
