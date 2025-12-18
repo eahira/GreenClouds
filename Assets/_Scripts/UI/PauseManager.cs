@@ -3,14 +3,16 @@ using UnityEngine.SceneManagement;
 
 public class PauseManager : MonoBehaviour
 {
-    private bool isPauseSceneLoaded = false;
+    private const string PauseSceneName = "PauseScene";
+
+    private bool IsPauseLoaded =>
+        SceneManager.GetSceneByName(PauseSceneName).isLoaded;
 
     void Update()
     {
-        // ESC переключает паузу
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (!isPauseSceneLoaded)
+            if (!IsPauseLoaded)
                 OpenPause();
             else
                 ClosePause();
@@ -19,15 +21,17 @@ public class PauseManager : MonoBehaviour
 
     public void OpenPause()
     {
+        if (IsPauseLoaded) return;
+
         Time.timeScale = 0f;
-        SceneManager.LoadSceneAsync("PauseScene", LoadSceneMode.Additive);
-        isPauseSceneLoaded = true;
+        SceneManager.LoadSceneAsync(PauseSceneName, LoadSceneMode.Additive);
     }
 
     public void ClosePause()
     {
+        if (!IsPauseLoaded) return;
+
         Time.timeScale = 1f;
-        SceneManager.UnloadSceneAsync("PauseScene");
-        isPauseSceneLoaded = false;
+        SceneManager.UnloadSceneAsync(PauseSceneName);
     }
 }

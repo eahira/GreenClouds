@@ -4,6 +4,12 @@ using TMPro;
 
 public class InGameUI : MonoBehaviour
 {
+	[Header("Avatar")]
+	public Image avatarImage;
+
+	[Tooltip("Порядок: Survivor, Robot, Angel")]
+	public Sprite[] avatarSprites;
+	
     [Header("Health")]
     public Image healthFill;
     public TextMeshProUGUI healthText;
@@ -57,6 +63,8 @@ public class InGameUI : MonoBehaviour
         if (pauseButton != null)
             pauseButton.onClick.AddListener(OnPauseClicked);
 
+		UpdateAvatar();
+
         if (levelText != null)
         {
             int stage = 1;
@@ -74,6 +82,25 @@ public class InGameUI : MonoBehaviour
         else
             ClearArtifactSlots();
     }
+	
+	private void UpdateAvatar()
+	{
+    	if (avatarImage == null) return;
+    	if (avatarSprites == null || avatarSprites.Length < 3) return;
+    	if (GameManager.Instance == null) return;
+
+    	int idx = 0;
+    	switch (GameManager.Instance.selectedCharacter)
+    	{
+        	case CharacterType.Survivor: idx = 0; break;
+        	case CharacterType.Robot:    idx = 1; break;
+        	case CharacterType.Angel:    idx = 2; break;
+    	}
+
+    	avatarImage.sprite = avatarSprites[idx];
+    	avatarImage.preserveAspect = true;
+    	avatarImage.enabled = (avatarImage.sprite != null);
+	}
 
     private void Update()
     {
