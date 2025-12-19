@@ -67,21 +67,23 @@ public class AdsService : MonoBehaviour
     }
 
     public void ShowRewarded(Action onReward, string placement = null)
-{
+    {
 #if UNITY_WEBGL && !UNITY_EDITOR
-    if (_ads == null || !_ads.isRewardedSupported) return;
+        if (_ads == null || !_ads.isRewardedSupported) return;
 
-    _pendingReward = onReward;
-    _ads.ShowRewarded(placement);
+        _pendingReward = onReward;
+        _ads.ShowRewarded(placement);
 #else
-    onReward?.Invoke();
+        // В редакторе сразу выдаём награду
+        onReward?.Invoke();
 #endif
-}
-
+    }
 
 #if UNITY_WEBGL
     private void OnRewardedStateChanged(RewardedState state)
     {
+        Debug.Log("Rewarded state: " + state);
+
         if (state == RewardedState.Rewarded)
         {
             _pendingReward?.Invoke();
