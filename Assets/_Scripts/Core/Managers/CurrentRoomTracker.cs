@@ -9,8 +9,7 @@ public class CurrentRoomTracker : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         CurrentRoom = GetComponentInParent<Room>();
-
-        // можно сразу обновлять камеру, если нужно
+        
         if (CurrentRoom != null && RoomCameraController.Instance != null)
             RoomCameraController.Instance.SetRoom(CurrentRoom);
     }

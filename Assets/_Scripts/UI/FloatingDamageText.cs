@@ -9,12 +9,8 @@ public class FloatingDamageText : MonoBehaviour
     [SerializeField] private float lifeTime = 0.7f;
     [SerializeField] private float moveSpeed = 1.5f;
 
-    /// <summary>
-    /// Спавн текста урона в мире.
-    /// </summary>
     public static void Spawn(Vector3 worldPos, int damage)
     {
-        // грузим префаб из Resources/FloatingDamageText один раз
         if (prefab == null)
         {
             prefab = Resources.Load<FloatingDamageText>("FloatingDamageText");
@@ -39,7 +35,6 @@ public class FloatingDamageText : MonoBehaviour
 
     private void Update()
     {
-        // поднимаем текст вверх
         transform.position += Vector3.up * moveSpeed * Time.deltaTime;
 
         lifeTime -= Time.deltaTime;

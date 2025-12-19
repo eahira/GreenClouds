@@ -38,7 +38,6 @@ public class RoomCombatController : MonoBehaviour
         if (enemySpawner != null)
             enemySpawner.player = playerTransform;
 
-        // по твоему ТЗ: пока НЕ зачищено — порталы и блокеры OFF
         if (room != null)
             room.SetCleared(false);
 
@@ -134,7 +133,6 @@ public class RoomCombatController : MonoBehaviour
 
         IsCleared = true;
 
-        // когда зачищено — порталы и блокеры ON
         if (room != null)
             room.SetCleared(true);
 

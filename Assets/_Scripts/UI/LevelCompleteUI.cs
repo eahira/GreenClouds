@@ -6,7 +6,7 @@ public class LevelCompleteUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI coinsText;
-    [SerializeField] private TextMeshProUGUI upgradesText; // можно оставить пустым / заполнять в инспекторе
+    [SerializeField] private TextMeshProUGUI upgradesText;
 
     private void Start()
     {
@@ -20,9 +20,7 @@ public class LevelCompleteUI : MonoBehaviour
 
         if (coinsText != null)
             coinsText.text = $"Вы набрали {gm.coins} монет";
-
-        // upgradesText можешь заполнять статикой, типа:
-        // "- +10% урон\n- +5% скорость" или просто оставить пустым
+        
     }
 
     public void OnMainMenuPressed()
@@ -34,7 +32,7 @@ public class LevelCompleteUI : MonoBehaviour
     {
         var gm = GameManager.Instance;
         if (gm != null)
-            gm.AdvanceStage();           // переходим к 2 или 3 уровню
+            gm.AdvanceStage();
 
         SceneManager.LoadScene("SampleScene");
     }

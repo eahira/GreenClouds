@@ -9,23 +9,23 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenuScene.unity
     guid: 44b0956c20ca38448ad6c1c3f97a2ffd
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
-    path: Assets/Scenes/SettingsScene.unity
-    guid: 97a8802e1450e574e8ffcc50ef5b6511
-  - enabled: 1
     path: Assets/Scenes/ShopScene.unity
     guid: 1f52a5432c0a6654298ca6ea458ed428
-  - enabled: 1
-    path: Assets/Scenes/PauseScene.unity
-    guid: 228f91c8615969c478f9209adaf3eef6
   - enabled: 1
     path: Assets/Scenes/CharacterSelectorScene.unity
     guid: bb671e85f7e04604eb5d99e279459435
   - enabled: 1
     path: Assets/Scenes/DifficultySelectorScene.unity
     guid: 6d5d2610ad124fa43a43f5c73b9cc115
+  - enabled: 1
+    path: Assets/Scenes/SampleScene.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/SettingsScene.unity
+    guid: 97a8802e1450e574e8ffcc50ef5b6511
+  - enabled: 1
+    path: Assets/Scenes/PauseScene.unity
+    guid: 228f91c8615969c478f9209adaf3eef6
   - enabled: 1
     path: Assets/Scenes/DefeatScene.unity
     guid: 2ef3aef89e222fe429c3f40979c246d5

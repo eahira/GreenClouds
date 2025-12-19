@@ -20,11 +20,9 @@ public class RoomPortal : MonoBehaviour
             return;
         }
 
-        // защита на случай, если статика пережила Play (Time.time снова с нуля)
         if (Time.time < globalLastTeleportTime)
             globalLastTeleportTime = -999f;
 
-        // глобальный кд, чтобы не телепортировать сразу назад/туда же
         if (Time.time - globalLastTeleportTime < teleportCooldown)
             return;
 

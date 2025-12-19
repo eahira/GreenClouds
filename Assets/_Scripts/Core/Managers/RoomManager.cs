@@ -125,15 +125,12 @@ public class RoomManager : MonoBehaviour
         if (roomCount >= maxRooms)
             return false;
 
-        // уже есть комната
         if (roomGrid[x, y] != 0)
             return false;
 
-        // шанс не создавать комнату (чтобы лабиринт был “дырявый”)
         if (Random.value < 0.5f)
             return false;
 
-        // чтобы не было слишком много связей (как у тебя)
         if (CountAdjacentRooms(roomIndex) > 1)
             return false;
 
@@ -152,7 +149,6 @@ public class RoomManager : MonoBehaviour
 
         roomObjects.Add(newRoom);
 
-        // ВАЖНО: двери открываем после добавления в список, чтобы GetRoomScriptAt нашёл соседей
         OpenDoors(newRoom, x, y);
 
         return true;
@@ -187,7 +183,6 @@ public class RoomManager : MonoBehaviour
         Room topRoom = GetRoomScriptAt(new Vector2Int(x, y + 1));
         Room bottomRoom = GetRoomScriptAt(new Vector2Int(x, y - 1));
 
-        // LEFT neighbor
         if (leftRoom != null)
         {
             newRoom.OpenDoor(Vector2Int.left);
@@ -200,7 +195,6 @@ public class RoomManager : MonoBehaviour
                 leftRoom.RightPortal.targetSpawnPoint = newRoom.EntryFromLeft;
         }
 
-        // RIGHT neighbor
         if (rightRoom != null)
         {
             newRoom.OpenDoor(Vector2Int.right);
@@ -213,7 +207,6 @@ public class RoomManager : MonoBehaviour
                 rightRoom.LeftPortal.targetSpawnPoint = newRoom.EntryFromRight;
         }
 
-        // BOTTOM neighbor
         if (bottomRoom != null)
         {
             newRoom.OpenDoor(Vector2Int.down);
@@ -226,7 +219,6 @@ public class RoomManager : MonoBehaviour
                 bottomRoom.TopPortal.targetSpawnPoint = newRoom.EntryFromBottom;
         }
 
-        // TOP neighbor
         if (topRoom != null)
         {
             newRoom.OpenDoor(Vector2Int.up);
@@ -304,7 +296,6 @@ public class RoomManager : MonoBehaviour
         }
     }
 
-    // -------------------- THEMES --------------------
     private StageTheme GetCurrentTheme()
     {
         int s = GameManager.Instance != null ? GameManager.Instance.CurrentStage : 1;
@@ -322,13 +313,11 @@ public class RoomManager : MonoBehaviour
         visuals.ApplyTheme(theme);
     }
 
-    // -------------------- COMBAT + BOSS --------------------
     private void SetupRoomsCombatAndBoss()
     {
         if (roomObjects == null || roomObjects.Count == 0)
             return;
 
-        // ищем игрока, если не назначен
         if (player == null)
         {
             var playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -342,7 +331,6 @@ public class RoomManager : MonoBehaviour
             return;
         }
 
-        // стартовая — первая созданная
         Room startRoom = roomObjects[0].GetComponent<Room>();
         if (startRoom == null)
             return;
@@ -352,7 +340,6 @@ public class RoomManager : MonoBehaviour
         if (RoomCameraController.Instance != null)
             RoomCameraController.Instance.SetRoom(startRoom);
 
-        // находим самую дальнюю комнату
         GameObject bossRoomObj = null;
         int maxDistance = -1;
 
@@ -373,7 +360,6 @@ public class RoomManager : MonoBehaviour
             }
         }
 
-        // настраиваем боёвку в каждой комнате
         foreach (var roomObj in roomObjects)
         {
             if (roomObj == null) continue;
