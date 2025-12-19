@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 450878dc19476bf4291d483f84169f67, type: 3}
+  m_Name: Skin_Robot
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkinData
+  characterType: 1
+  idleDown: {fileID: 311982201, guid: 5b1fc7fa3ac34614c80db7585bbe31fb, type: 3}
+  idleUp: {fileID: -1786053446, guid: 5b1fc7fa3ac34614c80db7585bbe31fb, type: 3}
+  idleLeft: {fileID: 1533319627, guid: 5b1fc7fa3ac34614c80db7585bbe31fb, type: 3}
+  idleRight: {fileID: 1703679030, guid: 5b1fc7fa3ac34614c80db7585bbe31fb, type: 3}
+  walkDown: []
+  walkUp: []
+  walkLeft: []
+  walkRight: []
+  useFlap: 0
+  flapFrames: []

@@ -1945,7 +1945,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoomCombatController
   enemySpawner: {fileID: 8593115427448548295}
-  bossPrefab: {fileID: 5002170955887930907, guid: 0e60120f46903174e916572c05a43ba6, type: 3}
+  bossStage1Prefab: {fileID: 5002170955887930907, guid: 0e60120f46903174e916572c05a43ba6, type: 3}
+  bossStage2Prefab: {fileID: 5002170955887930907, guid: 669b5b3c5b9b0f5479b628325d0d3aaa, type: 3}
+  bossStage3Prefab: {fileID: 5002170955887930907, guid: 76e77caba7fd3834cbe89189ebf7e1f3, type: 3}
   baseMinEnemies: 2
   baseMaxEnemies: 4
   isBossRoom: 1
@@ -2016,7 +2018,9 @@ MonoBehaviour:
   - {fileID: 1200044744894922601}
   - {fileID: 3865034910187928135}
   - {fileID: 1170625791718347199}
-  enemyPrefab: {fileID: 5002170955887930907, guid: 4e5eecd89a8c0a0418e2ac52802b2e71, type: 3}
+  enemyPrefabs:
+  - {fileID: 5002170955887930907, guid: 4e5eecd89a8c0a0418e2ac52802b2e71, type: 3}
+  - {fileID: 5002170955887930907, guid: 6fcd1f8815fa2f84c87eede87a71dbda, type: 3}
   player: {fileID: 0}
   spawnJitterRadius: 1.2
   minSpawnDistance: 0.9

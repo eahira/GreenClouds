@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7941860778118241005}
   - component: {fileID: -80675147891005010}
   m_Layer: 6
-  m_Name: Enemy
+  m_Name: Enemy_TypeA
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -83,12 +83,12 @@ SpriteRenderer:
   m_SortingLayerID: -2029212245
   m_SortingLayer: 5
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Sprite: {fileID: 21300000, guid: b7f18b2398876f2448e6bdff6763f950, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 4.0625, y: 4.0625}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -106,14 +106,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3960580f1020ea1439c538e25ff73986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  maxHealth: 10
+  maxHealth: 15
   currentHealth: 0
-  moveSpeed: 1
+  moveSpeed: 2
   aggroRange: 12
   obstacleMask:
     serializedVersion: 2
     m_Bits: 128
-  separationRadius: 0.8
+  separationRadius: 1.2
   separationStrength: 2
   enemyMask:
     serializedVersion: 2
@@ -123,15 +123,15 @@ MonoBehaviour:
   coinPrefab: {fileID: 6685550578039053460, guid: caa01e829a56de1439507a84b0b0278f, type: 3}
   healPrefab: {fileID: 4434309758655328118, guid: 5c449bb75b4a99a49acb34181fa8b69f, type: 3}
   artifactPickupPrefab: {fileID: 2242204682470391116, guid: 888588580283ba14281b67453ca754f1, type: 3}
-  coinChance: 0.75
-  healChance: 0.25
-  artifactChance: 0.2
+  coinChance: 1
+  healChance: 0.05
+  artifactChance: 0.02
   artifactPool:
   - {fileID: 11400000, guid: 37f2ac7b4b6d9734689890f8422e99a9, type: 2}
   - {fileID: 11400000, guid: 2595bf8d8ad87c74a88ceafc41562873, type: 2}
   - {fileID: 11400000, guid: 6ab454a08aee72940bfa1a4267e0ce4a, type: 2}
   - {fileID: 11400000, guid: 149bd60da2bab9141addb2c1ffb93d3c, type: 2}
-  dropScatterRadius: 0.6
+  dropScatterRadius: 0.7
 --- !u!61 &6134006413764794620
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -170,12 +170,12 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
+    oldSize: {x: 1.7333333, y: 1.7333333}
+    newSize: {x: 4.0625, y: 4.0625}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
-  m_AutoTiling: 0
+  m_AutoTiling: 1
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
 --- !u!50 &7941860778118241005
