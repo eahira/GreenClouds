@@ -3,15 +3,19 @@ using UnityEngine;
 
 public class RoomCombatController : MonoBehaviour
 {
-    [Header("Spawner и босс для этой комнаты")]
+    [Header("Spawner")]
     public EnemySpawner enemySpawner;
-    public GameObject bossPrefab;
 
-    [Header("Количество обычных врагов (базовое)")]
+    [Header("Boss Prefabs per Stage (1..3)")]
+    public GameObject bossStage1Prefab;
+    public GameObject bossStage2Prefab;
+    public GameObject bossStage3Prefab;
+
+    [Header("Enemies Count")]
     public int baseMinEnemies = 3;
     public int baseMaxEnemies = 6;
 
-    [Header("Флаги")]
+    [Header("Flags")]
     public bool isBossRoom = false;
 
     private readonly List<Enemy> enemies = new List<Enemy>();
@@ -34,19 +38,15 @@ public class RoomCombatController : MonoBehaviour
         if (enemySpawner != null)
             enemySpawner.player = playerTransform;
 
-        // ✅ По твоему ТЗ: пока НЕ зачищено — порталы и блокеры ВЫКЛ
+        // по твоему ТЗ: пока НЕ зачищено — порталы и блокеры OFF
         if (room != null)
             room.SetCleared(false);
 
         if (isBossRoom) SpawnBoss();
         else SpawnRegularEnemies();
 
-        // Если вдруг никого не заспавнилось — считаем комнату зачищенной сразу
         if (enemies.Count == 0 && room != null)
-        {
-            IsCleared = true;
             room.SetCleared(true);
-        }
     }
 
     void SpawnRegularEnemies()
@@ -80,14 +80,15 @@ public class RoomCombatController : MonoBehaviour
 
     void SpawnBoss()
     {
-        if (bossPrefab == null)
+        GameObject prefab = GetBossPrefabForCurrentStage();
+        if (prefab == null)
         {
-            Debug.LogWarning("RoomCombatController: bossPrefab не назначен, босс не заспавнится");
+            Debug.LogWarning("RoomCombatController: boss prefab is not assigned for this stage");
             return;
         }
 
         Vector3 pos = enemySpawner != null ? enemySpawner.transform.position : transform.position;
-        GameObject bossObj = Instantiate(bossPrefab, pos, Quaternion.identity, transform);
+        GameObject bossObj = Instantiate(prefab, pos, Quaternion.identity, transform);
 
         Enemy bossEnemy = bossObj.GetComponent<Enemy>();
         if (bossEnemy != null)
@@ -97,6 +98,14 @@ public class RoomCombatController : MonoBehaviour
 
             RegisterEnemy(bossEnemy);
         }
+    }
+
+    GameObject GetBossPrefabForCurrentStage()
+    {
+        int stage = GameManager.Instance != null ? GameManager.Instance.CurrentStage : 1;
+        if (stage == 2) return bossStage2Prefab != null ? bossStage2Prefab : bossStage1Prefab;
+        if (stage == 3) return bossStage3Prefab != null ? bossStage3Prefab : bossStage1Prefab;
+        return bossStage1Prefab;
     }
 
     void RegisterEnemies(List<Enemy> list)
@@ -121,22 +130,16 @@ public class RoomCombatController : MonoBehaviour
         if (enemy == null) return;
 
         enemies.Remove(enemy);
-
-        if (enemies.Count > 0)
-            return;
+        if (enemies.Count > 0) return;
 
         IsCleared = true;
-        Debug.Log($"Комната {name} зачищена");
 
-        // ✅ По твоему ТЗ: после зачистки — порталы и блокеры ВКЛ
+        // когда зачищено — порталы и блокеры ON
         if (room != null)
             room.SetCleared(true);
 
         if (isBossRoom && GameManager.Instance != null)
-        {
-            Debug.Log("Босс побеждён, уровень пройден");
             GameManager.Instance.LevelCompleted();
-        }
     }
 
     private void OnDestroy()

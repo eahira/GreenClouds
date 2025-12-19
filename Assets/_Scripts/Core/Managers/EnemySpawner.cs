@@ -6,8 +6,8 @@ public class EnemySpawner : MonoBehaviour
     [Header("Spawn Points")]
     public Transform[] spawnPoints;
 
-    [Header("Enemy Prefab")]
-    public GameObject enemyPrefab;
+    [Header("Enemy Prefabs (random)")]
+    public GameObject[] enemyPrefabs; // <-- теперь массив
 
     [Header("Player")]
     public Transform player;
@@ -29,7 +29,6 @@ public class EnemySpawner : MonoBehaviour
         if (enemyMask.value == 0)
             enemyMask = LayerMask.GetMask("Enemy");
 
-        // чтобы не забывали в инспекторе
         if (obstacleMask.value == 0)
             obstacleMask = LayerMask.GetMask("Wall");
     }
@@ -38,7 +37,10 @@ public class EnemySpawner : MonoBehaviour
     {
         List<Enemy> enemies = new List<Enemy>();
 
-        if (spawnPoints == null || spawnPoints.Length == 0 || enemyPrefab == null)
+        if (spawnPoints == null || spawnPoints.Length == 0)
+            return enemies;
+
+        if (enemyPrefabs == null || enemyPrefabs.Length == 0)
             return enemies;
 
         for (int i = 0; i < count; i++)
@@ -46,9 +48,12 @@ public class EnemySpawner : MonoBehaviour
             Transform point = spawnPoints[Random.Range(0, spawnPoints.Length)];
             Vector3 spawnPos = FindFreeSpawnPos(point.position);
 
-            GameObject obj = Instantiate(enemyPrefab, spawnPos, Quaternion.identity, transform);
-            Enemy enemy = obj.GetComponent<Enemy>();
+            GameObject prefab = PickEnemyPrefab();
+            if (prefab == null) continue;
 
+            GameObject obj = Instantiate(prefab, spawnPos, Quaternion.identity, transform);
+
+            Enemy enemy = obj.GetComponent<Enemy>();
             if (enemy != null && player != null)
                 enemy.Init(player);
 
@@ -61,6 +66,12 @@ public class EnemySpawner : MonoBehaviour
         return enemies;
     }
 
+    private GameObject PickEnemyPrefab()
+    {
+        // Можно добавить веса позже, сейчас просто равный рандом
+        return enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+    }
+
     private Vector3 FindFreeSpawnPos(Vector3 center)
     {
         for (int attempt = 0; attempt < maxAttemptsPerEnemy; attempt++)
@@ -68,11 +79,9 @@ public class EnemySpawner : MonoBehaviour
             Vector2 offset = Random.insideUnitCircle * spawnJitterRadius;
             Vector3 candidate = center + new Vector3(offset.x, offset.y, 0f);
 
-            // не ставим слишком близко к другим врагам
             if (Physics2D.OverlapCircle(candidate, minSpawnDistance, enemyMask) != null)
                 continue;
 
-            // не ставим рядом/в стене
             if (obstacleMask.value != 0)
             {
                 if (Physics2D.OverlapCircle(candidate, 0.45f, obstacleMask) != null)
@@ -82,22 +91,6 @@ public class EnemySpawner : MonoBehaviour
             return candidate;
         }
 
-        // fallback: чуть сдвигаем, чтобы не оказаться ровно в стене
         return center + new Vector3(0.5f, 0f, 0f);
     }
-
-#if UNITY_EDITOR
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        if (spawnPoints != null)
-        {
-            foreach (var sp in spawnPoints)
-            {
-                if (sp == null) continue;
-                Gizmos.DrawWireSphere(sp.position, spawnJitterRadius);
-            }
-        }
-    }
-#endif
 }

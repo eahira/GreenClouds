@@ -1,2 +1,15 @@
 fileFormatVersion: 2
 guid: c81fd576770bfc74886596baf0ab2731
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - enemySpawner: {instanceID: 0}
+  - bossStage1Prefab: {fileID: 5002170955887930907, guid: 0e60120f46903174e916572c05a43ba6, type: 3}
+  - bossStage2Prefab: {fileID: 5002170955887930907, guid: 669b5b3c5b9b0f5479b628325d0d3aaa, type: 3}
+  - bossStage3Prefab: {fileID: 5002170955887930907, guid: 76e77caba7fd3834cbe89189ebf7e1f3, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

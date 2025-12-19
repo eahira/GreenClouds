@@ -2753,11 +2753,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   spawnPoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  enemyPrefab: {fileID: 5002170955887930907, guid: 4e5eecd89a8c0a0418e2ac52802b2e71, type: 3}
+  - {fileID: 228568916}
+  - {fileID: 1113687502}
+  - {fileID: 1660706246}
+  - {fileID: 1847356154}
+  enemyPrefabs:
+  - {fileID: 5002170955887930907, guid: 4e5eecd89a8c0a0418e2ac52802b2e71, type: 3}
+  - {fileID: 5002170955887930907, guid: 6fcd1f8815fa2f84c87eede87a71dbda, type: 3}
   player: {fileID: 1905374647}
   spawnJitterRadius: 1.2
   minSpawnDistance: 0.9
@@ -3893,6 +3895,7 @@ GameObject:
   - component: {fileID: 1905374651}
   - component: {fileID: 1905374652}
   - component: {fileID: 1905374653}
+  - component: {fileID: 1905374654}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -3947,15 +3950,15 @@ SpriteRenderer:
   m_SortingLayerID: -2029212245
   m_SortingLayer: 5
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.16537353, g: 0.5622641, b: 0.15170519, a: 1}
+  m_Sprite: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &1905374647
@@ -4017,7 +4020,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1, y: 1.5}
   m_EdgeRadius: 0
 --- !u!114 &1905374649
 MonoBehaviour:
@@ -4119,6 +4122,24 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 64
+--- !u!114 &1905374654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905374645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b04d70069ef50a54ab7ade43cd9a90c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerVisual
+  survivorSkin: {fileID: 11400000, guid: 655c5ea88b0b9cb4db4956c5faafab36, type: 2}
+  robotSkin: {fileID: 11400000, guid: 97ef2c820599f62458df6a7112749de4, type: 2}
+  angelSkin: {fileID: 11400000, guid: 35b643e77e1334a41b23cad78ee7e71a, type: 2}
+  moveSpeedThreshold: 0.02
+  walkFps: 8
+  flapFps: 6
 --- !u!1 &1919195455
 GameObject:
   m_ObjectHideFlags: 0
