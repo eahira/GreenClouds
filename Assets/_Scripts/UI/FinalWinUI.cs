@@ -6,10 +6,12 @@ public class FinalWinUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI coinsText;
-    [SerializeField] private TextMeshProUGUI unlockText; // текст про нового героя/характеристику
+    [SerializeField] private TextMeshProUGUI unlockText;
 
     private void Start()
     {
+        AdsService.Instance?.ShowInterstitial("final_win");
+
         var gm = GameManager.Instance;
         if (gm == null) return;
 
@@ -18,10 +20,6 @@ public class FinalWinUI : MonoBehaviour
 
         if (coinsText != null)
             coinsText.text = $"Вы набрали {gm.coins} монет";
-
-        // Здесь можно написать, что открылось:
-        // Например: "Доступен новый персонаж для покупки: Робот"
-        // Пока можно задать этот текст прямо в инспекторе в unlockText.text
     }
 
     public void OnMainMenuPressed()

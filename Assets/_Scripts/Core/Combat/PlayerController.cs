@@ -24,15 +24,14 @@ public class PlayerController : MonoBehaviour
     private bool ghostShieldActive = false;
 
     [Header("Blessing Regen (only when idle)")]
-    public float blessingRegenPerSecond = 1.0f;      // рекомендую 0.5..1.0
-    public float blessingIdleSpeedThreshold = 0.08f; // чуть выше, чтобы точно не хилить “в движении”
+    public float blessingRegenPerSecond = 1.0f;
+    public float blessingIdleSpeedThreshold = 0.08f;
     public float blessingStartDelay = 0.25f;
     private float blessingIdleTimer = 0f;
     private float blessingRegenAccumulator = 0f;
 
     private ArtifactManager artifactManager;
 
-    // считаем реальную скорость через дельту позиции (работает даже с MovePosition/kinematic)
     private Vector2 _prevPos;
     private float _speedSqr;
 
@@ -67,7 +66,6 @@ public class PlayerController : MonoBehaviour
         else
             transform.position += (Vector3)step;
 
-        // реальная скорость = deltaPos / dt
         Vector2 newPos = rb != null ? rb.position : (Vector2)transform.position;
         Vector2 delta = newPos - _prevPos;
         _speedSqr = (delta / Time.fixedDeltaTime).sqrMagnitude;
@@ -149,7 +147,6 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        // GhostShield блокирует один удар
         if (ghostShieldActive)
         {
             ghostShieldActive = false;
@@ -172,7 +169,6 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // ShadowCloud: срабатывает при получении урона
         var cloud = GetComponent<ShadowCloudEffect>();
         if (cloud != null)
             cloud.OnPlayerDamaged();

@@ -7,7 +7,7 @@ public class EnemySpawner : MonoBehaviour
     public Transform[] spawnPoints;
 
     [Header("Enemy Prefabs (random)")]
-    public GameObject[] enemyPrefabs; // <-- теперь массив
+    public GameObject[] enemyPrefabs;
 
     [Header("Player")]
     public Transform player;
@@ -68,7 +68,6 @@ public class EnemySpawner : MonoBehaviour
 
     private GameObject PickEnemyPrefab()
     {
-        // ћожно добавить веса позже, сейчас просто равный рандом
         return enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
     }
 

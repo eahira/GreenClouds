@@ -53,7 +53,6 @@ public class Enemy : MonoBehaviour
     [Header("Drop Scatter")]
     public float dropScatterRadius = 0.6f;
 
-    // stun
     private float stunUntil = -1f;
 
     private void Awake()
@@ -126,7 +125,6 @@ public class Enemy : MonoBehaviour
             return;
         }
 
-        // не агримся через комнаты
         if (CurrentRoomTracker.CurrentRoom != null)
         {
             if (myRoom == null) return;
@@ -232,7 +230,7 @@ public class Enemy : MonoBehaviour
 
     private void TryHitPlayer(Collider2D other)
     {
-        if (IsStunned()) return; // ✅ стан блокирует атаки тоже
+        if (IsStunned()) return;
 
         if (!other.CompareTag("Player")) return;
         if (Time.time - lastAttackTime < attackCooldown) return;

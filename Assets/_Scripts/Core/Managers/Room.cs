@@ -42,7 +42,6 @@ public class Room : MonoBehaviour
 
     private void Awake()
     {
-        // ВАЖНО: по твоему ТЗ — пока не зачищена, порталы и блокеры выключены
         SetCleared(false);
         SnapBlocksToDoorways();
     }
@@ -54,7 +53,6 @@ public class Room : MonoBehaviour
     }
 #endif
 
-    // RoomManager вызывает это при генерации, чтобы “прорубить” проходы
     public void OpenDoor(Vector2Int direction)
     {
         if (direction == Vector2Int.up)
@@ -78,7 +76,6 @@ public class Room : MonoBehaviour
             if (rightDoor != null) rightDoor.SetActive(true);
         }
 
-        // НЕ включаем порталы/блокеры тут — они зависят от зачистки
         SetPortalsActive(false);
         SetDoorBlocksActive(false);
 
@@ -87,9 +84,6 @@ public class Room : MonoBehaviour
 
     public void SetCleared(bool cleared)
     {
-        // твоя логика:
-        // не зачищена => порталы OFF, блокеры OFF
-        // зачищена   => порталы ON,  блокеры ON
         SetPortalsActive(cleared);
         SetDoorBlocksActive(cleared);
     }

@@ -14,16 +14,13 @@ public class DifficultySelector : MonoBehaviour
 
     private void Start()
     {
-        // выбор сложности
         easyButton.onClick.AddListener(() => SelectDifficulty(DifficultyLevel.Easy));
         mediumButton.onClick.AddListener(() => SelectDifficulty(DifficultyLevel.Medium));
         hardButton.onClick.AddListener(() => SelectDifficulty(DifficultyLevel.Hard));
 
-        // навигация
         backButton.onClick.AddListener(OnBackPressed);
         acceptButton.onClick.AddListener(OnAcceptPressed);
 
-        // по умолчанию Medium
         HighlightButtons();
     }
 
@@ -35,7 +32,6 @@ public class DifficultySelector : MonoBehaviour
 
     private void HighlightButtons()
     {
-        // Очень простой визуал: меняем alpha цвета
         SetButtonState(easyButton,   selectedDifficulty == DifficultyLevel.Easy);
         SetButtonState(mediumButton, selectedDifficulty == DifficultyLevel.Medium);
         SetButtonState(hardButton,   selectedDifficulty == DifficultyLevel.Hard);

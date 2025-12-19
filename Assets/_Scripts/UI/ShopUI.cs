@@ -21,7 +21,6 @@ public class ShopUI : MonoBehaviour
         RefreshUI();
     }
 
-    // Обновляем всё визуально
     private void RefreshUI()
     {
         var gm = GameManager.Instance;
@@ -35,10 +34,8 @@ public class ShopUI : MonoBehaviour
             return;
         }
 
-        // Монеты
         UpdateCoinsUI(gm.coins);
 
-        // Робот
         if (robotPriceText != null)
         {
             robotPriceText.text = gm.robotUnlocked
@@ -51,7 +48,6 @@ public class ShopUI : MonoBehaviour
             robotBuyButton.interactable = !gm.robotUnlocked && gm.coins >= gm.robotPrice;
         }
 
-        // Ангел
         if (angelPriceText != null)
         {
             angelPriceText.text = gm.angelUnlocked
@@ -71,7 +67,6 @@ public class ShopUI : MonoBehaviour
             coinsValueText.text = coins.ToString();
     }
 
-    // Кнопка "Купить робота"
     public void OnBuyRobotPressed()
     {
         var gm = GameManager.Instance;
@@ -89,7 +84,6 @@ public class ShopUI : MonoBehaviour
         }
     }
 
-    // Кнопка "Купить ангела"
     public void OnBuyAngelPressed()
     {
         var gm = GameManager.Instance;
@@ -107,7 +101,25 @@ public class ShopUI : MonoBehaviour
         }
     }
 
-    // Кнопка "В главное меню"
+    public void OnGet100CoinsByAdPressed()
+    {
+        var gm = GameManager.Instance;
+        if (gm == null) return;
+
+        if (AdsService.Instance == null)
+        {
+            Debug.LogWarning("AdsService not found. Make sure SDK object with AdsService exists in MainMenuScene.");
+            return;
+        }
+
+        AdsService.Instance.ShowRewarded(() =>
+        {
+            gm.AddCoins(100);
+            RefreshUI();
+            Debug.Log("Rewarded: +100 coins");
+        }, "shop_100");
+    }
+
     public void OnBackToMenuPressed()
     {
         SceneManager.LoadScene("MainMenuScene");

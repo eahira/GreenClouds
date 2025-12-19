@@ -8,6 +8,8 @@ public class DefeatUI : MonoBehaviour
 
     private void Start()
     {
+        AdsService.Instance?.ShowInterstitial("defeat");
+
         if (coinsText != null && GameManager.Instance != null)
         {
             coinsText.text = $"Вы набрали {GameManager.Instance.coins} монет";
@@ -20,10 +22,7 @@ public class DefeatUI : MonoBehaviour
     }
 
     public void OnRestartPressed()
-	{
-	    // После смерти начинаем НОВЫЙ забег:
-	    // снова выбор персонажа -> потом выбор сложности -> потом SampleScene
-	    SceneManager.LoadScene("CharacterSelectorScene");
-	}
-
+    {
+        SceneManager.LoadScene("CharacterSelectorScene");
+    }
 }
