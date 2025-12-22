@@ -368,7 +368,11 @@ public class RoomManager : MonoBehaviour
             if (combat == null) continue;
 
             bool isBoss = (roomObj == bossRoomObj);
-            combat.Setup(player, isBoss);
+
+            Room r = roomObj.GetComponent<Room>();
+            bool isStart = (r != null && startRoom != null && r.RoomIndex == startRoom.RoomIndex);
+
+            combat.Setup(player, isBoss, isStart);
         }
 
         if (bossRoomObj != null)

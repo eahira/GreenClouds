@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     public bool robotUnlocked = false;
     public bool angelUnlocked = false;
     public int robotPrice = 500;
-    public int angelPrice = 800;
+    public int angelPrice = 500;
 
     [Header("Character selection & progress")]
     public CharacterType selectedCharacter = CharacterType.Survivor;
@@ -139,7 +139,7 @@ public class GameManager : MonoBehaviour
         switch (CurrentDifficulty)
         {
             case DifficultyLevel.Easy: return 0.8f;
-            case DifficultyLevel.Hard: return 1.4f;
+            case DifficultyLevel.Hard: return 1.2f;
             default: return 1.0f;
         }
     }
@@ -149,7 +149,7 @@ public class GameManager : MonoBehaviour
         switch (CurrentDifficulty)
         {
             case DifficultyLevel.Easy: return 0.8f;
-            case DifficultyLevel.Hard: return 1.5f;
+            case DifficultyLevel.Hard: return 1.3f;
             default: return 1.0f;
         }
     }
@@ -159,7 +159,7 @@ public class GameManager : MonoBehaviour
         switch (CurrentDifficulty)
         {
             case DifficultyLevel.Easy: return 0.8f;
-            case DifficultyLevel.Hard: return 1.3f;
+            case DifficultyLevel.Hard: return 1.2f;
             default: return 1.0f;
         }
     }

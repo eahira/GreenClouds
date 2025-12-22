@@ -124,7 +124,7 @@ MonoBehaviour:
   healPrefab: {fileID: 4434309758655328118, guid: 5c449bb75b4a99a49acb34181fa8b69f, type: 3}
   artifactPickupPrefab: {fileID: 2242204682470391116, guid: 888588580283ba14281b67453ca754f1, type: 3}
   coinChance: 1
-  healChance: 0.05
+  healChance: 0.1
   artifactChance: 0.02
   artifactPool:
   - {fileID: 11400000, guid: 37f2ac7b4b6d9734689890f8422e99a9, type: 2}

@@ -12,8 +12,8 @@ public class RoomCombatController : MonoBehaviour
     public GameObject bossStage3Prefab;
 
     [Header("Enemies Count")]
-    public int baseMinEnemies = 3;
-    public int baseMaxEnemies = 6;
+    public int baseMinEnemies = 2;
+    public int baseMaxEnemies = 4;
 
     [Header("Flags")]
     public bool isBossRoom = false;
@@ -29,7 +29,7 @@ public class RoomCombatController : MonoBehaviour
         room = GetComponent<Room>();
     }
 
-    public void Setup(Transform playerTransform, bool bossRoom)
+    public void Setup(Transform playerTransform, bool bossRoom, bool isStartRoom)
     {
         isBossRoom = bossRoom;
         IsCleared = false;
@@ -41,12 +41,21 @@ public class RoomCombatController : MonoBehaviour
         if (room != null)
             room.SetCleared(false);
 
+        if (isStartRoom)
+        {
+            IsCleared = true;
+            if (room != null)
+                room.SetCleared(true);
+            return;
+        }
+
         if (isBossRoom) SpawnBoss();
         else SpawnRegularEnemies();
 
         if (enemies.Count == 0 && room != null)
             room.SetCleared(true);
     }
+
 
     void SpawnRegularEnemies()
     {
