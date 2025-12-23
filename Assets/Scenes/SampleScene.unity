@@ -3601,7 +3601,7 @@ SpriteRenderer:
   m_SortingLayer: 5
   m_SortingOrder: 50
   m_Sprite: {fileID: -1114363831, guid: c333f252290d5e547929c31d86afb054, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.11764706}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.09803922}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4190,14 +4190,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34fdc9ffb2099a64395d632009c7c958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UltimateSystem
-  ultimateFill: {fileID: 0}
-  ultimateText: {fileID: 0}
   currentCharge: 0
   chargeNeeded: 10
   ultimateDamage: 50
   ultimateRadius: 3
   ultimateCircle: {fileID: 1407596102}
   circleShowTime: 0.25
+  ultimateFill: {fileID: 0}
+  ultimateText: {fileID: 0}
 --- !u!114 &1905374652
 MonoBehaviour:
   m_ObjectHideFlags: 0
