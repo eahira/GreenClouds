@@ -1,41 +1,46 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UltimateSystem : MonoBehaviour
 {
-    [Header("UI (старый локальный бар, можно не использовать)")]
-    public Image ultimateFill;
-    public Text ultimateText;
-
-    [Header("Заряд ульты")]
+    [Header("Charge")]
     public int currentCharge = 0;
     public int chargeNeeded = 10;
 
-    [Header("Параметры ульты")]
+    [Header("Ultimate Params")]
     public float ultimateDamage = 50f;
     public float ultimateRadius = 3f;
 
+    [Header("VFX")]
+    public GameObject ultimateCircle; 
+    public float circleShowTime = 0.25f;
+
+    [Header("Optional local UI (можно не использовать)")]
+    public Image ultimateFill;
+    public Text ultimateText;
 
     public static System.Action<int, int> OnUltimateChargeChanged;
 
+    private Coroutine circleRoutine;
+
     private void Start()
     {
-        UpdateUI();
-        NotifyUI();
-    }
+        if (ultimateCircle != null)
+            ultimateCircle.SetActive(false);
 
-    private void Update()
-    {
-        UpdateUI();
+        RefreshUI();
     }
-
 
     public void AddCharge(int amount)
     {
-        currentCharge += amount;
+        if (amount <= 0) return;
 
+        currentCharge += amount;
         if (currentCharge > chargeNeeded)
             currentCharge = chargeNeeded;
+
+        RefreshUI();
 
         if (currentCharge >= chargeNeeded)
         {
@@ -44,55 +49,70 @@ public class UltimateSystem : MonoBehaviour
             currentCharge = 0;
             chargeNeeded += 5;
             ultimateDamage += 10f;
+
+            RefreshUI();
         }
-
-        UpdateUI();
-        NotifyUI();
     }
-
 
     private void ActivateUltimate()
     {
-        Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, ultimateRadius);
+        ShowCircle();
 
-        foreach (var col in enemies)
+        Collider2D[] cols = Physics2D.OverlapCircleAll(transform.position, ultimateRadius);
+
+        for (int i = 0; i < cols.Length; i++)
         {
-            if (col.CompareTag("Enemy"))
-            {
-                Enemy enemy = col.GetComponent<Enemy>();
-                if (enemy != null)
-                    enemy.TakeDamage((int)ultimateDamage);
-            }
+            if (!cols[i].CompareTag("Enemy")) continue;
+
+            Enemy e = cols[i].GetComponent<Enemy>();
+            if (e != null)
+                e.TakeDamage((int)ultimateDamage);
         }
+
+        AudioManager.Instance?.PlayUltimate();
     }
 
-
-    private void UpdateUI()
+    private void ShowCircle()
     {
-        float fillPercent = 0f;
+        if (ultimateCircle == null) return;
 
-        if (chargeNeeded > 0)
-            fillPercent = Mathf.Clamp01((float)currentCharge / chargeNeeded);
+        ultimateCircle.transform.position = transform.position;
+
+        if (circleRoutine != null)
+            StopCoroutine(circleRoutine);
+
+        circleRoutine = StartCoroutine(CircleRoutine());
+    }
+
+    private IEnumerator CircleRoutine()
+    {
+        ultimateCircle.SetActive(true);
+        yield return new WaitForSeconds(circleShowTime);
+
+        if (ultimateCircle != null)
+            ultimateCircle.SetActive(false);
+
+        circleRoutine = null;
+    }
+
+    private void RefreshUI()
+    {
+        float fill = (chargeNeeded > 0) ? Mathf.Clamp01((float)currentCharge / chargeNeeded) : 0f;
 
         if (ultimateFill != null)
-            ultimateFill.fillAmount = fillPercent;
+            ultimateFill.fillAmount = fill;
 
         if (ultimateText != null)
-        {
-            int percent = Mathf.RoundToInt(fillPercent * 100f);
-            ultimateText.text = percent + "%";
-        }
-    }
+            ultimateText.text = Mathf.RoundToInt(fill * 100f) + "%";
 
-
-    private void NotifyUI()
-    {
         OnUltimateChargeChanged?.Invoke(currentCharge, chargeNeeded);
     }
 
+#if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, ultimateRadius);
     }
+#endif
 }

@@ -872,6 +872,7 @@ GameObject:
   - component: {fileID: 816946763}
   - component: {fileID: 816946762}
   - component: {fileID: 816946761}
+  - component: {fileID: 816946764}
   m_Layer: 5
   m_Name: Button_Back
   m_TagString: Untagged
@@ -955,6 +956,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 816946764}
+        m_TargetAssemblyTypeName: UIButtonSFX, Assembly-CSharp
+        m_MethodName: PlayClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &816946762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -993,6 +1006,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 816946759}
   m_CullTransparentMesh: 1
+--- !u!114 &816946764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 816946759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8897cca6107d51a4bb0f8ae983761289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonSFX
 --- !u!1 &839984240
 GameObject:
   m_ObjectHideFlags: 0
@@ -1248,6 +1273,7 @@ GameObject:
   - component: {fileID: 1340205211}
   - component: {fileID: 1340205210}
   - component: {fileID: 1340205209}
+  - component: {fileID: 1340205212}
   m_Layer: 5
   m_Name: Button_Accept
   m_TagString: Untagged
@@ -1331,6 +1357,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1340205212}
+        m_TargetAssemblyTypeName: UIButtonSFX, Assembly-CSharp
+        m_MethodName: PlayClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1340205210
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1369,6 +1407,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1340205207}
   m_CullTransparentMesh: 1
+--- !u!114 &1340205212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1340205207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8897cca6107d51a4bb0f8ae983761289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonSFX
 --- !u!1 &1341516008
 GameObject:
   m_ObjectHideFlags: 0
@@ -1864,6 +1914,7 @@ GameObject:
   - component: {fileID: 1692866206}
   - component: {fileID: 1692866205}
   - component: {fileID: 1692866204}
+  - component: {fileID: 1692866207}
   m_Layer: 5
   m_Name: Button_Prev
   m_TagString: Untagged
@@ -1946,6 +1997,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1692866207}
+        m_TargetAssemblyTypeName: UIButtonSFX, Assembly-CSharp
+        m_MethodName: PlayClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1692866205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1984,6 +2047,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1692866202}
   m_CullTransparentMesh: 1
+--- !u!114 &1692866207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1692866202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8897cca6107d51a4bb0f8ae983761289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonSFX
 --- !u!1 &1824776516
 GameObject:
   m_ObjectHideFlags: 0
@@ -2060,6 +2135,7 @@ GameObject:
   - component: {fileID: 1849478226}
   - component: {fileID: 1849478225}
   - component: {fileID: 1849478224}
+  - component: {fileID: 1849478227}
   m_Layer: 5
   m_Name: Button_Next
   m_TagString: Untagged
@@ -2142,6 +2218,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1849478227}
+        m_TargetAssemblyTypeName: UIButtonSFX, Assembly-CSharp
+        m_MethodName: PlayClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1849478225
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2180,6 +2268,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1849478222}
   m_CullTransparentMesh: 1
+--- !u!114 &1849478227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849478222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8897cca6107d51a4bb0f8ae983761289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonSFX
 --- !u!1 &2076139805
 GameObject:
   m_ObjectHideFlags: 0

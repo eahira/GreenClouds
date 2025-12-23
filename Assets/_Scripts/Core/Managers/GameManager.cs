@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
 public enum DifficultyLevel
 {
     Easy,
@@ -30,6 +31,22 @@ public class GameManager : MonoBehaviour
 
     [Header("Character selection & progress")]
     public CharacterType selectedCharacter = CharacterType.Survivor;
+
+    [Header("Character Stats")]
+    public CharacterStats survivorStats;
+    public CharacterStats robotStats;
+    public CharacterStats angelStats;
+
+    public CharacterStats GetSelectedStats()
+    {
+        switch (selectedCharacter)
+        {
+            case CharacterType.Robot: return robotStats != null ? robotStats : survivorStats;
+            case CharacterType.Angel: return angelStats != null ? angelStats : survivorStats;
+            default: return survivorStats;
+        }
+    }
+
 
     [Range(1, 3)] public int survivorStage = 1;
     [Range(1, 3)] public int robotStage = 1;

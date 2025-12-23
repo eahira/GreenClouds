@@ -28,6 +28,7 @@ public class RoomPortal : MonoBehaviour
 
         other.transform.position = targetSpawnPoint.position;
         globalLastTeleportTime = Time.time;
+        AudioManager.Instance?.PlayRoomTeleport();
 
         Room targetRoom = targetSpawnPoint.GetComponentInParent<Room>();
         if (targetRoom != null && RoomCameraController.Instance != null)

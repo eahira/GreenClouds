@@ -13,6 +13,7 @@ public class HealPickup : MonoBehaviour
 
         player.currentHealth = Mathf.Min(player.maxHealth, player.currentHealth + healAmount);
         PlayerEvents.OnPlayerHealthChanged?.Invoke(player.currentHealth, player.maxHealth);
+        AudioManager.Instance?.PlayHealPickup();
 
         Destroy(gameObject);
     }
