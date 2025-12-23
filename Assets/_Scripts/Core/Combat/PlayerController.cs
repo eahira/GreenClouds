@@ -38,15 +38,23 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        currentHealth = maxHealth;
 
         if (ultimateSystem == null)
             ultimateSystem = GetComponent<UltimateSystem>();
 
         artifactManager = GameManager.Instance != null ? GameManager.Instance.GetComponent<ArtifactManager>() : null;
 
+        ApplyCharacterStats();
+
+        currentHealth = maxHealth;
+
+        PlayerEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
+
+        if (ultimateSystem != null)
+            UltimateSystem.OnUltimateChargeChanged?.Invoke(ultimateSystem.currentCharge, ultimateSystem.chargeNeeded);
         _prevPos = rb != null ? rb.position : (Vector2)transform.position;
     }
+
 
     private void Update()
     {
@@ -142,7 +150,15 @@ public class PlayerController : MonoBehaviour
             dmg = effects.ModifyClickDamage(clickDamage);
 
         enemy.TakeDamage(dmg);
-        ultimateSystem?.AddCharge(1);
+        AudioManager.Instance?.PlayEnemyHit();
+        int add = 1;
+        if (GameManager.Instance != null)
+        {
+            var stats = GameManager.Instance.GetSelectedStats();
+            if (stats != null) add = stats.chargeAddPerClick;
+        }
+        ultimateSystem?.AddCharge(add);
+
     }
 
     public void TakeDamage(int damage)
@@ -159,6 +175,7 @@ public class PlayerController : MonoBehaviour
         }
 
         currentHealth -= damage;
+        AudioManager.Instance?.PlayPlayerHit();
 
         PlayerEvents.OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth);
         FloatingDamageText.Spawn(transform.position + Vector3.up * 1.0f, damage);
@@ -194,4 +211,24 @@ public class PlayerController : MonoBehaviour
         GameManager.Instance.PlayerDied();
         gameObject.SetActive(false);
     }
+
+    private void ApplyCharacterStats()
+    {
+        if (GameManager.Instance == null) return;
+
+        var stats = GameManager.Instance.GetSelectedStats();
+        if (stats == null) return;
+
+        maxHealth = stats.maxHealth;
+        moveSpeed = stats.moveSpeed;
+        clickDamage = stats.clickDamage;
+
+        if (ultimateSystem != null)
+        {
+            ultimateSystem.chargeNeeded = stats.chargeNeeded;
+            ultimateSystem.ultimateDamage = stats.ultimateDamage;
+            ultimateSystem.ultimateRadius = stats.ultimateRadius;
+        }
+    }
+
 }

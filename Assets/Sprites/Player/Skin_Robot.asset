@@ -13,13 +13,21 @@ MonoBehaviour:
   m_Name: Skin_Robot
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSkinData
   characterType: 1
-  idleDown: {fileID: 311982201, guid: 5b1fc7fa3ac34614c80db7585bbe31fb, type: 3}
-  idleUp: {fileID: -1786053446, guid: 5b1fc7fa3ac34614c80db7585bbe31fb, type: 3}
-  idleLeft: {fileID: 1533319627, guid: 5b1fc7fa3ac34614c80db7585bbe31fb, type: 3}
-  idleRight: {fileID: 1703679030, guid: 5b1fc7fa3ac34614c80db7585bbe31fb, type: 3}
-  walkDown: []
-  walkUp: []
-  walkLeft: []
-  walkRight: []
+  idleDown: {fileID: 364462985, guid: 257562a3e5eb0c34681fe4149d983b38, type: 3}
+  idleUp: {fileID: 1613692557, guid: 257562a3e5eb0c34681fe4149d983b38, type: 3}
+  idleLeft: {fileID: 1975036485, guid: 257562a3e5eb0c34681fe4149d983b38, type: 3}
+  idleRight: {fileID: -1704353244, guid: 22aac6799e6f40c43962b19e1cb38590, type: 3}
+  walkDown:
+  - {fileID: 364462985, guid: 257562a3e5eb0c34681fe4149d983b38, type: 3}
+  - {fileID: -1463814766, guid: 257562a3e5eb0c34681fe4149d983b38, type: 3}
+  walkUp:
+  - {fileID: 1613692557, guid: 257562a3e5eb0c34681fe4149d983b38, type: 3}
+  - {fileID: -531868007, guid: 257562a3e5eb0c34681fe4149d983b38, type: 3}
+  walkLeft:
+  - {fileID: 1975036485, guid: 257562a3e5eb0c34681fe4149d983b38, type: 3}
+  - {fileID: 282334318, guid: 257562a3e5eb0c34681fe4149d983b38, type: 3}
+  walkRight:
+  - {fileID: -1704353244, guid: 22aac6799e6f40c43962b19e1cb38590, type: 3}
+  - {fileID: -293132904, guid: 22aac6799e6f40c43962b19e1cb38590, type: 3}
   useFlap: 0
   flapFrames: []

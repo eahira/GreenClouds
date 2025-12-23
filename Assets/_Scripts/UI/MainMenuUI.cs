@@ -13,6 +13,11 @@ public class MainMenuUI : MonoBehaviour
         SceneManager.LoadScene("ShopScene");
     }
 
+    public void OnTutorialPressed()
+    {
+        SceneManager.LoadScene("TutorialScene");
+    }
+
     public void OnSettingsPressed()
     {
         SceneManager.LoadScene("SettingsScene");
