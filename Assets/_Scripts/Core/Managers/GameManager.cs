@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 public enum DifficultyLevel
 {
     Easy,
@@ -47,7 +46,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
     [Range(1, 3)] public int survivorStage = 1;
     [Range(1, 3)] public int robotStage = 1;
     [Range(1, 3)] public int angelStage = 1;
@@ -80,6 +78,8 @@ public class GameManager : MonoBehaviour
     [Header("Difficulty")]
     public DifficultyLevel CurrentDifficulty { get; private set; } = DifficultyLevel.Medium;
 
+    private ArtifactManager _artifactManager;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -91,16 +91,26 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        if (GetComponent<ArtifactManager>() == null)
-            gameObject.AddComponent<ArtifactManager>();
+        _artifactManager = GetComponent<ArtifactManager>();
+        if (_artifactManager == null)
+            _artifactManager = gameObject.AddComponent<ArtifactManager>();
     }
 
-    public void SelectCharacter(CharacterType type)
+    public void SelectCharacter(CharacterType type) => selectedCharacter = type;
+
+    public void StartNewRun()
     {
-        selectedCharacter = type;
+        _artifactManager?.ResetRun();
+        ResetCurrentStageOnly();
     }
 
     public void ResetCurrentStage()
+    {
+        _artifactManager?.ResetRun();
+        ResetCurrentStageOnly();
+    }
+
+    private void ResetCurrentStageOnly()
     {
         CurrentStage = 1;
     }
@@ -190,12 +200,12 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Player died");
 
-        GetComponent<ArtifactManager>()?.ResetRun();
+        _artifactManager?.ResetRun();
+        ResetCurrentStageOnly();
 
-        ResetCurrentStage();
         SceneManager.LoadScene("DefeatScene");
     }
-    
+
     public void LevelCompleted()
     {
         Debug.Log($"Level {CurrentStage} completed");
@@ -206,9 +216,9 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            GetComponent<ArtifactManager>()?.ResetRun();
+            _artifactManager?.ResetRun();
+            ResetCurrentStageOnly();
 
-            ResetCurrentStage();
             SceneManager.LoadScene("FinalWinScene");
         }
     }

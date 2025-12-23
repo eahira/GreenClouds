@@ -17,19 +17,30 @@ public class AudioManager : MonoBehaviour
     public AudioClip menuMusic;
     public AudioClip gameMusic;
 
-    [Header("scenes MENU")]
+    [Header("Optional Overrides (exact scene names)")]
     public string[] menuSceneNames =
     {
         "MainMenuScene",
         "CharacterSelectorScene",
         "DifficultySelectorScene",
-        "ShopScene"
+        "ShopScene",
+        "SettingsScene",
+        "TutorialScene",
+        "PauseScene",
+        "LevelCompleteScene",
+        "DefeatScene",
+        "FinalWinScene"
     };
 
-    [Header("scenes GAME")]
     public string[] gameSceneNames =
     {
         "SampleScene"
+    };
+
+    [Header("Auto-detect (keywords in scene name)")]
+    public string[] menuKeywords =
+    {
+        "Menu","Shop","Selector","Settings","Tutorial","Pause","Win","Defeat","Complete"
     };
 
     [Header("UI")]
@@ -46,6 +57,8 @@ public class AudioManager : MonoBehaviour
     public AudioClip healPickup;
     public AudioClip artifactPickup;
 
+    private bool _subscribed;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -60,13 +73,37 @@ public class AudioManager : MonoBehaviour
         EnsureSources();
         ApplyVolumes();
 
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        Subscribe();
+
+        DecideMusicForScene(SceneManager.GetActiveScene().name, forceRestart: false);
+    }
+
+    private void OnEnable() => Subscribe();
+
+    private void OnDisable()
+    {
+        if (!_subscribed) return;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+        _subscribed = false;
     }
 
     private void OnDestroy()
     {
-        if (Instance == this)
+        if (Instance == this && _subscribed)
+        {
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+            _subscribed = false;
+        }
+    }
+
+    private void Subscribe()
+    {
+        if (_subscribed) return;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+        _subscribed = true;
     }
 
     private void EnsureSources()
@@ -98,24 +135,53 @@ public class AudioManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        string sceneName = scene.name;
+        DecideMusicForScene(SceneManager.GetActiveScene().name, forceRestart: false);
+    }
 
+    private void OnActiveSceneChanged(Scene oldScene, Scene newScene)
+    {
+        DecideMusicForScene(newScene.name, forceRestart: false);
+    }
+
+    private void DecideMusicForScene(string sceneName, bool forceRestart)
+    {
         if (IsInList(sceneName, menuSceneNames))
         {
-            PlayMusic(menuMusic);
+            PlayMusic(menuMusic, restartIfSame: forceRestart);
+            return;
         }
-        else if (IsInList(sceneName, gameSceneNames))
+
+        if (IsInList(sceneName, gameSceneNames))
         {
-            PlayMusic(gameMusic);
+            PlayMusic(gameMusic, restartIfSame: forceRestart);
+            return;
         }
+
+        if (ContainsAny(sceneName, menuKeywords))
+        {
+            PlayMusic(menuMusic, restartIfSame: forceRestart);
+            return;
+        }
+
+        PlayMusic(gameMusic, restartIfSame: forceRestart);
     }
 
     private bool IsInList(string sceneName, string[] list)
     {
         if (list == null) return false;
         for (int i = 0; i < list.Length; i++)
-        {
             if (list[i] == sceneName) return true;
+        return false;
+    }
+
+    private bool ContainsAny(string text, string[] keywords)
+    {
+        if (keywords == null) return false;
+        for (int i = 0; i < keywords.Length; i++)
+        {
+            var k = keywords[i];
+            if (string.IsNullOrEmpty(k)) continue;
+            if (text.Contains(k)) return true;
         }
         return false;
     }
@@ -127,16 +193,10 @@ public class AudioManager : MonoBehaviour
         if (!restartIfSame && musicSource.clip == clip && musicSource.isPlaying)
             return;
 
+        musicSource.Stop();
         musicSource.clip = clip;
         musicSource.volume = musicVolume;
         musicSource.Play();
-    }
-
-    public void StopMusic()
-    {
-        if (musicSource == null) return;
-        musicSource.Stop();
-        musicSource.clip = null;
     }
 
     private void PlaySFX(AudioClip clip, float volumeMul = 1f)
@@ -146,13 +206,10 @@ public class AudioManager : MonoBehaviour
     }
 
     public void PlayUIClick() => PlaySFX(uiClick, 0.9f);
-
     public void PlayPlayerHit() => PlaySFX(playerHit, 1.0f);
     public void PlayEnemyHit() => PlaySFX(enemyHit, 0.9f);
     public void PlayUltimate() => PlaySFX(ultimate, 1.0f);
-
     public void PlayRoomTeleport() => PlaySFX(roomTeleport, 0.9f);
-
     public void PlayCoinPickup() => PlaySFX(coinPickup, 0.85f);
     public void PlayHealPickup() => PlaySFX(healPickup, 0.9f);
     public void PlayArtifactPickup() => PlaySFX(artifactPickup, 1.0f);
